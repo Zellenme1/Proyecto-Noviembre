@@ -1,0 +1,35 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+    <section class="container">
+        <h2>Gestión de Servicios (SPA)</h2>
+        
+        <form id="form-servicio" style="margin-bottom: 2rem;">
+            <h3>Publicar nuevo servicio</h3>
+            <div>
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+            <div>
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" required></textarea>
+            </div>
+            <div>
+                <label for="id_categoria">Categoría ID:</label>
+                <input type="number" id="id_categoria" name="id_categoria" required>
+            </div>
+            <input type="hidden" id="id_usuario" name="id_usuario" value="1">
+            <button type="submit">Guardar Servicio</button>
+        </form>
+
+        <hr>
+
+        <div id="app-servicios"></div>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    <script src="/js/servicios-spa.js" defer></script>
+{% endblock %}
