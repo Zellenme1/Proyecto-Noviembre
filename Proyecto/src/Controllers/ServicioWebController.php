@@ -9,7 +9,7 @@ class ServicioWebController
     private Environment $twig;
 
     public function __construct(){
-        $loader = new FilesystemLoader(__DIR__ . '/../../views');
+        $loader = new FilesystemLoader(__DIR__ . '/../../templates');
         $this->twig = new Environment($loader);
     }
 

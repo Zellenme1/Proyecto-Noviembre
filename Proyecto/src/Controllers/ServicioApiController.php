@@ -76,7 +76,7 @@ class ServicioApiController {
         }
     }
 
-    public function delete(int $id): void {;
+    public function destroy(int $id): void {;
         if (!$this->servicioDAO->getById($id)) {
             $this->jsonResponse(['error' => 'Servicio no encontrado'], 404);
             return;

@@ -1,0 +1,22 @@
+/*1. Aplica un fondo azul oscuro al elemento #cabecera y texto blanco.*/
+#cabecera{
+    background-color: blue;
+    color: white;
+}
+/*2. Da a todas las noticias un borde de 1 px y un fondo blanco.*/
+.noticia{
+    border: 1px solid lightgray;
+    background-color: white;
+}
+/*3. Utiliza un selector de clase para destacar .importante.*/
+.importante{
+    color: red;
+}
+/*4. Añade un margen inferior de 20 px a cada noticia.*/
+.noticia{
+    margin-bottom: 20xp;
+}
+/*5. Cambia el color de los títulos de las noticias sin modificar el título principal.*/
+.noticia{
+    color: green;
+}

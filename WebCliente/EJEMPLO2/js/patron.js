@@ -1,0 +1,14 @@
+/* MATRICULA
+DNI
+TELEFONO FIJO
+TELEFONO MOVIL
+Nº TARJETA
+FICHERO IMAGEN
+FECHA*/
+
+let DNI = /^[0-9]{8}[A-Z]$/; /* "11111111A".math(/^(\d{8})([TRWAGMYFPDXBNJZSQVHLCKE])$/ig).exec(11111111H) */
+let TELEFONO_FIJO = /^[0-9]{9}$/;
+let TELEFONO_MOVIL = /^[0-9]{9}$/;
+let Nº_TARJETA = /^[0-9]{16}$/;
+let FICHERO_IMAGEN
+let  FECHA = /^[1-9]{2}\/[1-9]{2}\/[1-9]{4}$/;

@@ -1,0 +1,10 @@
+.tipo{
+    margin-left: 100px;
+    background-color: aqua;
+    display: inline-block;
+    width: 120px;
+}
+
+.dato{
+    background-color: lightgrey;
+}

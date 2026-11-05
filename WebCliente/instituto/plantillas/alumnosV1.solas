@@ -1,0 +1,20 @@
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>DNI</th>
+<th>NOMBRE</th>
+<th>APELLIDOS</th>
+<th>CURSO</th>
+</tr>
+</thead>
+<tbody class="alumnos">
+<tr class="alumno">
+<td class="id"></td>
+<td class="dni"></td>
+<td class="nombre"></td>
+<td class="apellidos"></td>
+<td class="curso"></td>
+</tr>
+</tbody>
+</table>

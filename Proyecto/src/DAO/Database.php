@@ -12,7 +12,7 @@ class Database {
         $host = getenv('DB_HOST') ?: 'db';
         $name = getenv('DB_NAME') ?: 'trueques_db';
         $user = getenv('DB_USER') ?: 'usuario_trueque';
-        $password = getenv('DB_PASSWORD') ?: 'password_secret';
+        $password = getenv('DB_PASS') ?: (getenv('DB_PASSWORD') ?: 'password_secret');
 
         try {
             $this->connection = new PDO(

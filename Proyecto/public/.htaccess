@@ -1,0 +1,20 @@
+# ==============================================================================
+# REGLAS DE REESCRITURA DE URL (FRONT CONTROLLER & RUTAS AMIGABLES)
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+
+    # 1. Activa el motor de reescritura de URLs
+    RewriteEngine On
+
+    # 2. CONDICIÓN 1: ¿La ruta solicitada NO es un archivo físico en el disco?
+    # Si la petición es '/js/servicios-spa.js', se sirve directamente.
+    RewriteCond %{REQUEST_FILENAME} !-f
+
+    # 3. CONDICIÓN 2: ¿La ruta solicitada NO es un directorio/carpeta real en el disco?
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # 4. REGLA DE REESCRITURA: Redirige transparente a index.php
+    RewriteRule ^ index.php [QSA,L]
+
+</IfModule>

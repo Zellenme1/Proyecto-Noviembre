@@ -1,0 +1,33 @@
+/*
+  1. Diseña una cabecera con navegación horizontal.
+  2. Distribuye la foto y la información del perfil mediante Flexbox.
+  3. Da estilo a la lista de habilidades.
+  4. Crea un botón de contacto reutilizable mediante una clase.
+  5. Define una anchura máxima para el contenido y centra la página.
+  6. Mantén una paleta de colores coherente en toda la interfaz.
+*/
+:root { --azul: darkslateblue; --claro: lavender; --acento: chocolate; }   
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.6; color: var(--azul); }
+
+
+.cabecera { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1rem 2rem; background: var(--azul); color: white; }
+.cabecera h1 { margin: 0; font-size: 1.4rem; }
+nav { display: flex; gap: 1rem; }
+nav a { color: white; }
+
+
+main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+
+.perfil { display: flex; align-items: center; flex-wrap: wrap; gap: 2rem; }
+.perfil img { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; }
+
+
+ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+li { padding: .3rem 1rem; background: var(--claro); border-radius: 999px; }
+
+
+.boton { display: inline-block; padding: .6rem 1.4rem; background: var(--acento); color: white; border-radius: 6px; text-decoration: none; }
+.boton:hover { opacity: .85; }

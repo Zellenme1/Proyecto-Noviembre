@@ -1,0 +1,73 @@
+version: '3'
+services:
+  
+  #-------------------------------------------------------------------------
+  # SERVICIO SERVIDOR WEB (php:8.3-apache con mysqli y pdo_mysql)
+  #-------------------------------------------------------------------------
+  web:
+    # IMAGEN CONSTRUIDA A PARTIR DEL DOCKERFILE DE ESTA CARPETA
+    build: .
+    # NOMBRE QUE LE VOY A DAR AL CONTENEDOR
+    container_name: web
+    # REDIRECCIÓN DE PUERTOS
+    ports:
+      - 8181:80     
+    # CARPETA LOCAL CONECTADA AL CONTENEDOR (LOS CAMBIOS SE VEN AL GUARDAR)
+    volumes:
+      - ./src:/var/www/html
+    # LISTA DE VALORES DE ENTORNO (LEÍDOS DEL ARCHIVO .env)
+    environment:
+      DB_HOST: datos
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    # SERVICIOS QUE TIENEN QUE ARRANCAR ANTES DE ARRANCAR ESTE
+    depends_on:
+     - datos
+    # REDES A USAR
+    networks:
+      - ejemplo
+  
+  #--------------------------------------------------
+  # SERVICIO SERVIDOR DE BASE DE DATOS MARIADB
+  #--------------------------------------------------
+
+  # NOMBRE DEL SERVICIO
+  datos:
+    # IMAGEN USADA
+    image: mariadb
+    # NOMBRE QUE LE VOY A DAR AL CONTENEDOR
+    container_name: bd
+    # LISTA DE VALORES DE ENTORNO (LEÍDOS DEL ARCHIVO .env)
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    # REDIRECCIÓN DE PUERTOS
+    ports:
+      - 3316:3306
+    # VOLÚMENES A USAR POR EL CONTENEDOR
+    volumes:
+      # DOCKER VOLUME
+      - data:/var/lib/mysql
+    # REDES A USAR
+    networks:
+      - ejemplo
+
+# DEFINICIÓN DE VOLÚMENES DOCKER A USAR POR LOS SERVICIOS (OPCIONAL)
+volumes:
+  data:
+    # TIPO DE DRIVER
+    driver: local
+
+# DEFINICIÓN DE LAS REDES A USAR POR LOS SERVICIOS (OPCIONAL)
+networks:
+  # NOMBRE DE LA RED
+  ejemplo:
+    # DRIVER DE LA RED
+    driver: bridge
+    ipam:
+      driver: default
+      config:         
+        - subnet: 172.20.0.0/16

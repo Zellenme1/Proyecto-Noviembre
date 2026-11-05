@@ -1,0 +1,31 @@
+/*
+  1. Distingue los campos válidos e inválidos con :valid y :invalid.
+  2. No mostrar todos los campos como erróneos antes de interactuar.
+  3. Personaliza :checked, :required y :focus-visible.
+  4. Utiliza :not() para excluir determinados elementos de una regla.
+  5. Añade indicadores de estado sin depender solo del color.
+  6. Comprueba que los controles siguen siendo utilizables con el teclado.
+*/
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 1rem; font-family: system-ui, sans-serif; background: lavender; }
+.registro { width: 100%; max-width: 400px; padding: 2rem; background: white; border-radius: 12px; }
+h1 { margin-top: 0; font-size: 1.5rem; }
+
+form { display: flex; flex-direction: column; gap: .4rem; }
+label:not(.aceptacion) { margin-top: .5rem; font-weight: 600; }      
+
+input:not([type="checkbox"]) { padding: .6rem; border: 2px solid lightslategray; border-radius: 6px; font-size: 1rem; }   
+input:required:not([type="checkbox"]) { border-left-width: 6px; }                                                  
+
+
+input:user-valid   { border-color: seagreen; border-style: solid; }
+input:user-invalid { border-color: firebrick; border-style: dashed; }
+
+
+input:focus-visible, button:focus-visible { outline: 3px solid royalblue; outline-offset: 2px; }   
+.aceptacion { display: flex; align-items: center; gap: .5rem; margin: 1rem 0; }
+.aceptacion input { accent-color: royalblue; width: 1.2rem; height: 1.2rem; }
+.aceptacion:has(input:checked) { font-weight: 600; }                                             
+
+button { padding: .8rem; border: 0; border-radius: 6px; background: royalblue; color: white; font-size: 1rem; cursor: pointer; }
+button:hover { background: royalblue; }

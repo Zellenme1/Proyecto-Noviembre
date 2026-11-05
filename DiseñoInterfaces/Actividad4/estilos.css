@@ -1,0 +1,28 @@
+/*1. Limita el ancho del artículo a 750 px y céntralo.*/
+/*2. Define una tipografía, tamaño y color para el texto.*/
+/*3. Diferencia visualmente el título, los subtítulos y la firma del autor.*/
+/*4. Utiliza line-height, font-weight, text-transform y letter-spacing.*/
+/*5. Asegúrate de que los párrafos sean cómodos de leer.*/
+
+.portada {
+    min-height: 300px;
+    background: linear-gradient(150deg, purple, grey);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.portada a {
+    display: inline-block;
+    margin: auto;
+    min-width: 200%;
+    max-width: 150%;
+    padding: 10px;
+    background-color: aqua;
+    text-decoration: none;
+}
+
+.portada a:hover {
+    background-color: green;
+}

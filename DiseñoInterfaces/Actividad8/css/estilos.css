@@ -1,0 +1,27 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+
+form{
+    max-width: 250px;
+    margin: auto;
+}
+
+label, input, textarea{
+    width: 100%;
+}
+
+input, textarea{
+    border: 2px solid lightskyblue;
+    background: lightblue;
+    border-radius: 5px;
+}
+
+input:focus, textarea:focus{
+    border: 2px solid red;
+}
+
+input:valid, textarea:required{
+    border: 1px solid green;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Coches</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <div id="formulario">
+
+            <label for="matricula">Matrícula:</label>
+            <input type="text" id="matricula" name="matricula">
+            
+            <br>
+
+            <label for="color">Color:</label>
+            <input type="text" id="color" name="color">
+
+            <br>
+
+            <label for="puertas">Número de puertas:</label>
+            <input type="number" id="puertas" name="puertas">
+
+            <br>
+
+            <label for="annio">Año:</label>
+            <input type="number" id="annio" name="annio">
+
+            <br>
+
+            <button type="button" id="annadir">Añadir</button>
+    </div>
+
+    <div id="tabla">
+        <button type="button" id="limpiar">Limpiar Tabla</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Matrícula</button></th>
+                <th>Color</button></th>
+                <th>Número de puertas</button></th>
+                <th>Annio</button></th>
+            </tr>
+        </thead>
+
+        <tbody id="lista-coches">
+        </tbody>
+
+    </table>
+
+    <button type="button" id="ordenarMatricula">Ordenar por Matrícula</button>
+    <button type="button" id="ordenarColor">Ordenar por Color</button>
+    <button type="button" id="ordenarPuertas">Ordenar por puertas</button>
+    <button type="button" id="ordenarAnnio">Ordenar por Año</button>
+    </div>
+
+
+
+    <script src="js/garaje.js"></script>
+
+</body>
+</html>

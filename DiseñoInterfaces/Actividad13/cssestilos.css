@@ -1,0 +1,33 @@
+/*
+  1. Crea una cuadrícula de tres columnas.
+  2. Haz que la noticia principal ocupe dos columnas.
+  3. Define separaciones horizontales y verticales.
+  4. Utiliza minmax() y unidades fr.
+  5. Añade fondos, bordes y jerarquía tipográfica.
+  6. Evita que el contenido desborde las columnas.
+*/
+
+* { box-sizing: border-box; }
+body { margin: 0; padding: 2rem 1rem; font-family: system-ui, sans-serif; background: linen; }
+h1 { text-align: center; }
+
+.noticias {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); 
+  column-gap: 1.5rem; row-gap: 1rem;                 
+  max-width: 1000px; margin: 0 auto;
+}
+
+.noticia {
+  padding: 1rem; background: white; border: 1px solid lightgray; border-radius: 6px;   
+  overflow-wrap: anywhere;                                                       
+}
+.noticia h2 { margin: 0 0 .4rem; font-size: 1.2rem; }
+
+.principal { grid-column: span 2; background: midnightblue; color: white; }  
+.principal h2 { font-size: 2rem; }                                     
+
+@media (max-width: 600px) {
+  .noticias { grid-template-columns: 1fr; }
+  .principal { grid-column: auto; }
+}

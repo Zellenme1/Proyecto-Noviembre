@@ -16,8 +16,12 @@ class Router {
         $primerSegmento = $segments[0] ?? null;
 
         switch ($primerSegmento) {
+            case null: // raíz "/"
+                header('Location: /servicios');
+                break;
+                
             case 'api':
-                $this->handleApiRoutes($method, $segments);
+                $this->despacharApiRoutes($method, $segments);
                 break;
 
             case 'servicios':

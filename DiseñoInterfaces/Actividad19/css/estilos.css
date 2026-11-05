@@ -1,0 +1,42 @@
+/*
+  1. Crea una cabecera con navegación horizontal.
+  2. Distribuye el contenido y la barra lateral mediante Grid.
+  3. Destaca el primer artículo visualmente.
+  4. Diseña las tarjetas de artículos con estilos reutilizables.
+  5. Haz que la barra lateral pase debajo de los artículos en pantallas pequeñas.
+  6. Añade estados de interacción a los enlaces y un pie de página diferenciado.
+*/
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.6; background: whitesmoke; color: darkslategray; }
+
+
+.cabecera { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; padding: 1rem 2rem; background: midnightblue; color: white; }
+.cabecera h1 { margin: 0; font-size: 1.5rem; }
+nav { display: flex; gap: 1rem; }
+
+
+a { color: steelblue; }
+nav a { color: white; }
+a:hover, a:focus-visible { color: orange; }
+
+
+.layout { display: grid; gap: 1.5rem; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+.articulos { display: grid; gap: 1.5rem; }
+@media (min-width: 800px) {
+  .layout { grid-template-columns: 3fr 1fr; }
+  .articulos { grid-template-columns: 1fr 1fr; align-content: start; }
+  .destacado { grid-column: 1 / -1; }
+}
+
+
+article, aside { padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 8px color-mix(in srgb, black 8%, transparent); }
+article h2, aside h2 { margin-top: 0; }
+aside { align-self: start; }
+
+
+.destacado { background: midnightblue; color: white; border-left: 6px solid khaki; }
+.destacado a { color: khaki; }
+
+
+footer { padding: 1.5rem; text-align: center; background: midnightblue; color: white; }
+footer p { margin: 0; }

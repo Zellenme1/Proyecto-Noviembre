@@ -1,0 +1,34 @@
+/*1. Crea una portada de al menos 300 px de altura.*/
+/*2. Aplica un degradado con linear-gradient().*/
+/*3. Centra vertical y horizontalmente el contenido de la portada.*/
+/*4. Diseña el enlace como un botón mediante CSS.*/
+/*5. Añade contraste suficiente entre el texto y el fondo.*/
+
+.portada {
+  min-height: 300px;
+  background: linear-gradient(150deg, purple, grey);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+.portada a {
+  display: inline-block;
+  min-width: 200px;
+  padding: 10px;
+  background-color: midnightblue;
+  color: white;
+  text-decoration: none;
+  border-radius: 100px;
+  box-shadow: 10px 10px darkgray;
+}
+
+
+.portada a:hover {
+    background-color: white;
+    color: grey;
+    box-shadow: 2;
+}

@@ -1,0 +1,34 @@
+/*
+  1. Declara en :root variables para los colores principales.
+  2. Define variables para el espaciado, los bordes y las sombras.
+  3. Reutiliza las variables en todos los componentes.
+  4. Modifica la paleta cambiando únicamente las variables.
+  5. Añade un tema alternativo mediante una clase (.tema-oscuro).
+  Ampliación: var() con valores de reserva.
+  (Para probar el tema: <body class="tema-oscuro">)
+*/
+:root {
+  --primario: slateblue; --fondo: whitesmoke; --superficie: white; --texto: darkslateblue;   
+  --espacio: 1.5rem;                                                              
+  --borde: 1px solid gainsboro; --radio: 12px; --sombra: 0 4px 14px color-mix(in srgb, black 10%, transparent);   
+}
+.tema-oscuro {                                                                    
+  --primario: mediumpurple; --fondo: black; --superficie: darkslateblue; --texto: lavender;
+  --borde: 1px solid darkslateblue;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--fondo); color: var(--texto); }   
+.cabecera { padding: var(--espacio); background: var(--primario); color: var(--fondo); }
+.cabecera h1 { margin: 0; }
+main { max-width: 800px; margin: var(--espacio) auto; padding: 0 var(--espacio); display: grid; gap: var(--espacio); }
+
+.tarjeta { padding: var(--espacio); background: var(--superficie); border: var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); }
+.tarjeta h2 { margin-top: 0; color: var(--primario); }
+
+.boton {
+  display: inline-block; padding: var(--espacio-boton, 0.7rem) var(--espacio);   
+  background: var(--primario); color: var(--texto-boton, white);                   
+  border-radius: var(--radio); text-decoration: none;
+}
+.boton:hover { opacity: .85; }
