@@ -1,6 +1,0 @@
-FROM mysql:8.0.30
-
-ENV MYSQL_ROOT_PASSWORD=rootpass
-ENV MYSQL_DATABASE=mi_base_datos
-ENV MYSQL_USER=usuario_app
-ENV MYSQL_PASSWORD=pass_app 
