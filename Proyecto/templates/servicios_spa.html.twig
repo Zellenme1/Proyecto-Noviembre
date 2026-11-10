@@ -1,0 +1,48 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+    <section class="container">
+        <h2>Catálogo de servicios</h2>
+
+        <p id="mensaje" role="status" aria-live="polite" hidden></p>
+
+        <form id="form-servicio" novalidate>
+            <h3 id="form-titulo">Nuevo servicio</h3>
+
+            <input type="hidden" id="id_servicio" name="id_servicio">
+
+            <div>
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" maxlength="150" required>
+            </div>
+            <div>
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion"></textarea>
+            </div>
+            <div>
+                <label for="id_categoria">Categoría</label>
+                <select id="id_categoria" name="id_categoria" required>
+                    <option value="">Cargando categorías…</option>
+                </select>
+            </div>
+            <div>
+                <label for="puntos_hora_referencia">Puntos por hora (referencia)</label>
+                <input type="number" id="puntos_hora_referencia" name="puntos_hora_referencia"
+                       min="1" max="500" step="1" required>
+            </div>
+
+            <button type="submit" id="btn-guardar">Crear servicio</button>
+            <button type="button" id="btn-cancelar" hidden>Cancelar edición</button>
+        </form>
+
+        <hr>
+
+        <div id="app-servicios"></div>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    <script type="module" src="/js/servicios-spa.js"></script>
+{% endblock %}
