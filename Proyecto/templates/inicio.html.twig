@@ -1,0 +1,11 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+    <section class="container">
+        <h2>Hola, {{ usuario.nombre }}</h2>
+        <p>Tu saldo actual es de <strong>{{ usuario.puntosSaldo }} puntos</strong>.</p>
+        <p>Tu panel de profesional estará disponible aquí: ofertas, agenda y solicitudes.</p>
+    </section>
+{% endblock %}

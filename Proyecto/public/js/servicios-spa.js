@@ -2,6 +2,8 @@
 // Catálogo de servicios (admin): listar, crear, editar y eliminar vía fetch.
 // =============================================================================
 
+import { fetchJSON, escapeHTML, textoError } from './api.js';
+
 const form = document.getElementById('form-servicio');
 const lista = document.getElementById('app-servicios');
 const mensaje = document.getElementById('mensaje');
@@ -17,46 +19,10 @@ let servicios = [];
 // Utilidades
 // -----------------------------------------------------------------------------
 
-/** fetch + JSON con manejo de errores común. Lanza Error con .status y .details. */
-async function fetchJSON(url, options = {}) {
-    const response = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        ...options,
-    });
-
-    let data = null;
-    try {
-        data = await response.json();
-    } catch {
-        // respuesta sin cuerpo JSON
-    }
-
-    if (!response.ok) {
-        const error = new Error(data?.error ?? `Error HTTP ${response.status}`);
-        error.status = response.status;
-        error.details = data?.errores ?? null;
-        throw error;
-    }
-    return data;
-}
-
-function escapeHTML(valor) {
-    return String(valor ?? '').replace(/[&<>'"]/g, (c) => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
-    }[c]));
-}
-
 function mostrarMensaje(texto, tipo = 'ok') {
     mensaje.textContent = texto;
     mensaje.dataset.tipo = tipo; // 'ok' | 'error' (para estilizar con CSS)
     mensaje.hidden = false;
-}
-
-function textoError(error) {
-    if (error.details) {
-        return `${error.message}: ${Object.values(error.details).join(' · ')}`;
-    }
-    return error.message;
 }
 
 // -----------------------------------------------------------------------------

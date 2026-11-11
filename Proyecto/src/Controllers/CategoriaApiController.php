@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Auth;
 use App\DAO\CategoriaDAO;
 
 /**
@@ -20,6 +21,7 @@ class CategoriaApiController extends ApiController
 
     public function index(): void
     {
+        Auth::requireLogin();
         $this->jsonResponse($this->categoriaDAO->getAll());
     }
 }

@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Auth;
 use App\DAO\CategoriaDAO;
 use App\DAO\ServicioDAO;
 use App\Models\Servicio;
+use App\Models\Usuario;
 
 /**
  * CRUD del catálogo global de servicios.
- * TODO (fase de autenticación): restringir store/update/destroy al rol ADMIN.
+ * Lectura: cualquier usuario con sesión. Escritura (crear/editar/borrar): solo ADMIN.
  */
 class ServicioApiController extends ApiController
 {
@@ -24,6 +26,7 @@ class ServicioApiController extends ApiController
 
     public function index(): void
     {
+        Auth::requireLogin();
         if (isset($_GET['id_categoria'])) {
             $servicios = $this->servicioDAO->getByCategoria((int)$_GET['id_categoria']);
         } else {
@@ -34,6 +37,7 @@ class ServicioApiController extends ApiController
 
     public function show(int $id): void
     {
+        Auth::requireLogin();
         $servicio = $this->servicioDAO->getById($id);
         if ($servicio === null) {
             $this->jsonResponse(['error' => 'Servicio no encontrado'], 404);
@@ -43,6 +47,7 @@ class ServicioApiController extends ApiController
 
     public function store(): void
     {
+        Auth::requireRole(Usuario::ROL_ADMIN);
         ['errores' => $errores, 'datos' => $d] = $this->validar($this->readJsonBody());
         if ($errores) {
             $this->jsonResponse(['error' => 'Datos no válidos', 'errores' => $errores], 422);
@@ -56,6 +61,7 @@ class ServicioApiController extends ApiController
 
     public function update(int $id): void
     {
+        Auth::requireRole(Usuario::ROL_ADMIN);
         if ($this->servicioDAO->getById($id) === null) {
             $this->jsonResponse(['error' => 'Servicio no encontrado'], 404);
         }
@@ -73,6 +79,7 @@ class ServicioApiController extends ApiController
 
     public function destroy(int $id): void
     {
+        Auth::requireRole(Usuario::ROL_ADMIN);
         if ($this->servicioDAO->getById($id) === null) {
             $this->jsonResponse(['error' => 'Servicio no encontrado'], 404);
         }

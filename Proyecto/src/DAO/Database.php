@@ -1,14 +1,18 @@
 <?php
+declare(strict_types=1);
+
 namespace App\DAO;
 
 use PDO;
 use PDOException;
 
-class Database {
+class Database
+{
     private static ?Database $instance = null;
     private PDO $connection;
 
-    private function __construct() {
+    private function __construct()
+    {
         $host = getenv('DB_HOST') ?: 'db';
         $name = getenv('DB_NAME') ?: 'trueques_db';
         $user = getenv('DB_USER') ?: 'usuario_trueque';
@@ -21,31 +25,36 @@ class Database {
                 $pass,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 ]
             );
         } catch (PDOException $e) {
+            // El detalle (host, usuario...) va al log del servidor, nunca al cliente.
+            error_log('Error de conexión a la BD: ' . $e->getMessage());
             http_response_code(500);
-            header("Content-Type: application/json; charset=UTF-8");
-            echo json_encode(['error' => 'Error de conexión a la BD: ' . $e->getMessage()]);
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode(['error' => 'Error interno del servidor'], JSON_UNESCAPED_UNICODE);
             exit;
         }
     }
 
-    public static function getInstance(): Database {
+    public static function getInstance(): Database
+    {
         if (self::$instance === null) {
             self::$instance = new Database();
         }
         return self::$instance;
     }
 
-    public function getConnection(): PDO {
+    public function getConnection(): PDO
+    {
         return $this->connection;
     }
 
     private function __clone() {}
 
-    public function __wakeup() {
-        throw new \Exception("No se permite deserializar una instancia de Singleton.");
+    public function __wakeup()
+    {
+        throw new \Exception('No se permite deserializar una instancia de Singleton.');
     }
 }

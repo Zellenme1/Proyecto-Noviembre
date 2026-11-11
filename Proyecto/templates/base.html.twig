@@ -3,17 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}Plataforma Trueques{% endblock %}</title>
 </head>
 <body>
     <header>
-        <h1>Trueques Profesional</h1>
+        <h1><a href="/">Trueques Profesional</a></h1>
+
+        {% if usuario %}
+            <nav aria-label="Cuenta">
+                <span>{{ usuario.nombre }} · {{ usuario.puntosSaldo }} puntos</span>
+                {% if usuario.rol == 'ADMIN' %}
+                    <a href="/servicios-spa">Catálogo</a>
+                {% endif %}
+                <button type="button" id="btn-logout">Cerrar sesión</button>
+            </nav>
+        {% endif %}
     </header>
 
     <main>
         {% block content %}{% endblock %}
     </main>
 
+    <script type="module" src="/js/layout.js"></script>
     {% block javascript %}{% endblock %}
 </body>
 </html>

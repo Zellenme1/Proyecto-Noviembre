@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Controllers\AuthApiController;
 use App\Controllers\CategoriaApiController;
+use App\Controllers\PaginaController;
 use App\Controllers\ServicioApiController;
 use App\Controllers\ServicioWebController;
 
@@ -23,12 +25,19 @@ class Router
                 $this->despacharApi($method, $segments);
                 break;
 
+            case '':
+                $this->soloGet($method);
+                (new PaginaController())->inicio();
+                break;
+
+            case 'login':
+                $this->soloGet($method);
+                (new PaginaController())->login();
+                break;
+
             case 'servicios-spa':
-                if ($method === 'GET') {
-                    (new ServicioWebController())->spa();
-                } else {
-                    $this->responderError(405, 'Método no permitido para esta vista');
-                }
+                $this->soloGet($method);
+                (new ServicioWebController())->spa();
                 break;
 
             default:
@@ -38,10 +47,35 @@ class Router
 
     private function despacharApi(string $method, array $segments): void
     {
+        // CSRF: toda petición que modifica datos debe llevar el token de la sesión.
+        if (!in_array($method, ['GET', 'HEAD', 'OPTIONS'], true) && !Csrf::isValid()) {
+            $this->responderError(403, 'Token CSRF no válido o ausente');
+        }
+
         $recurso = $segments[1] ?? null;
         $id = isset($segments[2]) ? (int)$segments[2] : null;
 
         switch ($recurso) {
+            case 'login':
+                $this->soloMetodo($method, 'POST');
+                (new AuthApiController())->login();
+                break;
+
+            case 'logout':
+                $this->soloMetodo($method, 'POST');
+                (new AuthApiController())->logout();
+                break;
+
+            case 'registro':
+                $this->soloMetodo($method, 'POST');
+                (new AuthApiController())->registro();
+                break;
+
+            case 'me':
+                $this->soloMetodo($method, 'GET');
+                (new AuthApiController())->me();
+                break;
+
             case 'servicios':
                 $controller = new ServicioApiController();
 
@@ -68,9 +102,7 @@ class Router
                 break;
 
             case 'categorias':
-                if ($method !== 'GET') {
-                    $this->responderError(405, 'Método HTTP no soportado');
-                }
+                $this->soloMetodo($method, 'GET');
                 (new CategoriaApiController())->index();
                 break;
 
@@ -79,7 +111,19 @@ class Router
         }
     }
 
-    private function responderError(int $code, string $message): void
+    private function soloGet(string $method): void
+    {
+        $this->soloMetodo($method, 'GET');
+    }
+
+    private function soloMetodo(string $method, string $permitido): void
+    {
+        if ($method !== $permitido) {
+            $this->responderError(405, 'Método HTTP no soportado');
+        }
+    }
+
+    private function responderError(int $code, string $message): never
     {
         http_response_code($code);
         header('Content-Type: application/json; charset=UTF-8');
