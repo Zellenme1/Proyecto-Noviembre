@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Auth;
 use App\DAO\CategoriaDAO;
 
 /**
- * Por ahora solo lectura (para rellenar el desplegable de categorías).
+ * Por ahora solo lectura, y pública: rellena el filtro del buscador de servicios.
  * El CRUD de categorías del admin se añadirá en su fase.
  */
 class CategoriaApiController extends ApiController
@@ -21,7 +20,6 @@ class CategoriaApiController extends ApiController
 
     public function index(): void
     {
-        Auth::requireLogin();
         $this->jsonResponse($this->categoriaDAO->getAll());
     }
 }

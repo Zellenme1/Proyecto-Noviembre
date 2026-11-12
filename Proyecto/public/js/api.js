@@ -57,3 +57,24 @@ export function textoError(error) {
         ? `${error.message}: ${Object.values(error.details).join(' · ')}`
         : error.message;
 }
+
+/** Fecha de MySQL ("2026-11-20 09:00:00") en formato legible para el usuario. */
+export function formatearFecha(valor) {
+    const fecha = new Date(String(valor ?? '').replace(' ', 'T'));
+    return Number.isNaN(fecha.getTime())
+        ? String(valor ?? '')
+        : fecha.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+const ETIQUETAS_ESTADO = {
+    SOLICITADO: 'Pendiente de respuesta',
+    ACEPTADO: 'Aceptada',
+    RECHAZADO: 'Rechazada',
+    EN_EJECUCION: 'En curso',
+    COMPLETADO: 'Completada',
+    CANCELADO: 'Cancelada',
+};
+
+export function etiquetaEstado(estado) {
+    return ETIQUETAS_ESTADO[estado] ?? estado;
+}

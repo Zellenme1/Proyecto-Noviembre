@@ -2,6 +2,8 @@
 
 {% block title %}{{ titulo_pagina }}{% endblock %}
 
+{% block body_class %}pagina-login{% endblock %}
+
 {% block content %}
     <section class="container">
         <h2>Iniciar sesión</h2>
@@ -19,6 +21,7 @@
             </div>
             <button type="submit" id="btn-entrar">Entrar</button>
         </form>
+        <p class="aviso-alterno">¿No tienes cuenta? <a href="/registro">Regístrate</a></p>
     </section>
 {% endblock %}
 

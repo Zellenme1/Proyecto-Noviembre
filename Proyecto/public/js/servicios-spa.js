@@ -55,12 +55,20 @@ function renderizarLista() {
     }
 
     lista.innerHTML = '<ul class="lista-servicios">' + servicios.map((s) => `
-        <li id="servicio-${s.id_servicio}">
-            <h4>${escapeHTML(s.nombre)}</h4>
-            <p><strong>${escapeHTML(s.categoria_nombre)}</strong> · ${s.puntos_hora_referencia} puntos/hora</p>
-            <p>${escapeHTML(s.descripcion)}</p>
-            <button type="button" class="btn-editar" data-id="${s.id_servicio}">Editar</button>
-            <button type="button" class="btn-eliminar" data-id="${s.id_servicio}">Eliminar</button>
+        <li id="servicio-${s.id_servicio}" class="ticket">
+            <div class="ticket-cuerpo">
+                <h4>${escapeHTML(s.nombre)}</h4>
+                <p class="ticket-categoria">${escapeHTML(s.categoria_nombre)}</p>
+                ${s.descripcion ? `<p class="ticket-desc">${escapeHTML(s.descripcion)}</p>` : ''}
+                <div class="acciones">
+                    <button type="button" class="btn-editar" data-id="${s.id_servicio}">Editar</button>
+                    <button type="button" class="btn-eliminar" data-id="${s.id_servicio}">Eliminar</button>
+                </div>
+            </div>
+            <div class="ticket-talon">
+                <strong>${s.puntos_hora_referencia}</strong>
+                <span>puntos/hora</span>
+            </div>
         </li>`).join('') + '</ul>';
 }
 

@@ -3,7 +3,7 @@
 {% block title %}{{ titulo_pagina }}{% endblock %}
 
 {% block content %}
-    <section class="container">
+    <section class="container catalogo">
         <h2>Catálogo de servicios</h2>
 
         <p id="mensaje" role="status" aria-live="polite" hidden></p>
@@ -37,9 +37,10 @@
             <button type="button" id="btn-cancelar" hidden>Cancelar edición</button>
         </form>
 
-        <hr>
-
-        <div id="app-servicios"></div>
+        <div class="catalogo-lista">
+            <h3>Servicios publicados</h3>
+            <div id="app-servicios"></div>
+        </div>
     </section>
 {% endblock %}
 

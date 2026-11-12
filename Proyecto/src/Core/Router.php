@@ -5,9 +5,11 @@ namespace App\Core;
 
 use App\Controllers\AuthApiController;
 use App\Controllers\CategoriaApiController;
+use App\Controllers\OfertaApiController;
 use App\Controllers\PaginaController;
 use App\Controllers\ServicioApiController;
 use App\Controllers\ServicioWebController;
+use App\Controllers\SolicitudApiController;
 
 class Router
 {
@@ -33,6 +35,21 @@ class Router
             case 'login':
                 $this->soloGet($method);
                 (new PaginaController())->login();
+                break;
+
+            case 'registro':
+                $this->soloGet($method);
+                (new PaginaController())->registro();
+                break;
+
+            case 'buscar':
+                $this->soloGet($method);
+                (new PaginaController())->buscar();
+                break;
+
+            case 'solicitudes':
+                $this->soloGet($method);
+                (new PaginaController())->solicitudes();
                 break;
 
             case 'servicios-spa':
@@ -104,6 +121,31 @@ class Router
             case 'categorias':
                 $this->soloMetodo($method, 'GET');
                 (new CategoriaApiController())->index();
+                break;
+
+            case 'ofertas':
+                $this->soloMetodo($method, 'GET');
+                (new OfertaApiController())->index();
+                break;
+
+            case 'solicitudes':
+                $controller = new SolicitudApiController();
+
+                switch ($method) {
+                    case 'GET':
+                        $controller->index();
+                        break;
+                    case 'POST':
+                        $controller->store();
+                        break;
+                    case 'PUT':
+                        $id !== null && $id > 0
+                            ? $controller->update($id)
+                            : $this->responderError(400, 'Falta el ID en la URI para actualizar');
+                        break;
+                    default:
+                        $this->responderError(405, 'Método HTTP no soportado');
+                }
                 break;
 
             default:
