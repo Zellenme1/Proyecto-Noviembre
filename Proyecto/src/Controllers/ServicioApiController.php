@@ -11,7 +11,7 @@ use App\Models\Usuario;
 
 /**
  * CRUD del catálogo global de servicios.
- * Lectura: cualquier usuario con sesión. Escritura (crear/editar/borrar): solo ADMIN.
+ * Lectura del listado: pública (lo usa el registro para elegir servicios). Escritura: solo ADMIN.
  */
 class ServicioApiController extends ApiController
 {
@@ -26,7 +26,6 @@ class ServicioApiController extends ApiController
 
     public function index(): void
     {
-        Auth::requireLogin();
         if (isset($_GET['id_categoria'])) {
             $servicios = $this->servicioDAO->getByCategoria((int)$_GET['id_categoria']);
         } else {

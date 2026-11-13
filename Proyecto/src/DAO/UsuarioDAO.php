@@ -9,7 +9,7 @@ use PDO;
 class UsuarioDAO
 {
     private const COLUMNAS = 'id_usuario, nombre, apellidos, email, password, telefono,
-                              rol, puntos_saldo, fecha_registro, activo';
+                              rol, puntos_saldo, fecha_registro, activo, foto';
 
     private PDO $db;
 
@@ -60,6 +60,13 @@ class UsuarioDAO
         return (int)$this->db->lastInsertId();
     }
 
+    /** Guarda la ruta pública de la foto de perfil (o NULL para quitarla). */
+    public function actualizarFoto(int $idUsuario, ?string $ruta): void
+    {
+        $stmt = $this->db->prepare('UPDATE usuarios SET foto = :foto WHERE id_usuario = :id');
+        $stmt->execute([':foto' => $ruta, ':id' => $idUsuario]);
+    }
+
     private function mapToObject(array $row): Usuario
     {
         return new Usuario(
@@ -72,7 +79,8 @@ class UsuarioDAO
             $row['rol'],
             (int)$row['puntos_saldo'],
             $row['fecha_registro'],
-            (bool)(int)$row['activo']
+            (bool)(int)$row['activo'],
+            $row['foto']
         );
     }
 }

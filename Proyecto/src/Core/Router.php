@@ -7,6 +7,7 @@ use App\Controllers\AuthApiController;
 use App\Controllers\CategoriaApiController;
 use App\Controllers\OfertaApiController;
 use App\Controllers\PaginaController;
+use App\Controllers\PerfilApiController;
 use App\Controllers\ServicioApiController;
 use App\Controllers\ServicioWebController;
 use App\Controllers\SolicitudApiController;
@@ -116,6 +117,11 @@ class Router
                     default:
                         $this->responderError(405, 'Método HTTP no soportado');
                 }
+                break;
+
+            case 'foto':
+                $this->soloMetodo($method, 'POST');
+                (new PerfilApiController())->subirFoto();
                 break;
 
             case 'categorias':

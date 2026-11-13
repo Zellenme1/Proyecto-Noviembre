@@ -17,7 +17,8 @@ export async function fetchJSON(url, options = {}) {
     const method = (options.method ?? 'GET').toUpperCase();
     const headers = { Accept: 'application/json', ...(options.headers ?? {}) };
 
-    if (options.body !== undefined) {
+    // Con FormData (subida de archivos) el navegador pone él mismo el Content-Type con su frontera.
+    if (options.body !== undefined && !(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
     }
     if (method !== 'GET' && method !== 'HEAD') {

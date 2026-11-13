@@ -1,3 +1,15 @@
+/* ==============================================================================
+   BANCO DE HORAS Y SERVICIOS — hoja de estilos (CSS3 nativo, sin frameworks)
+
+   Idea visual: un banco de horas entre profesionales de oficio. Azul de mono de
+   trabajo para la estructura y amarillo de señal para los puntos. Cada servicio
+   del catálogo es un tique con su talón: el talón amarillo lleva la tarifa.
+   Es lo único decorativo; el resto se mantiene plano y sobrio.
+
+   Índice: 1. Variables  2. Base  3. Cabecera  4. Formularios y botones
+           5. Mensajes  6. Catálogo (tiques)  7. Login e inicio  8. Accesibilidad
+   ============================================================================== */
+
 /* ---------- 1. VARIABLES ---------- */
 :root {
     color-scheme: light dark;
@@ -520,3 +532,87 @@ dialog form { border: 0; border-radius: var(--r-panel); }
     color: var(--err-ink);
     border-color: var(--err-line);
 }
+
+/* ---------- 11. REGISTRO CON SELECTOR DE SERVICIOS Y FOTO ---------- */
+.pagina-registro .container { width: min(100%, 46rem); }
+
+.selector-servicios { display: grid; gap: 0.6rem; min-width: 0; margin: 0; padding: 0; border: 0; }
+.selector-servicios legend { padding: 0; font-weight: 700; }
+
+.selector-columnas { display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
+@media (min-width: 40rem) {
+    .selector-columnas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.selector-columna { display: grid; gap: 0.35rem; align-content: start; min-width: 0; }
+.selector-titulo { margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--ink-soft); }
+
+.selector-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    height: 12rem;
+    margin: 0;
+    padding: 0.25rem;
+    overflow-y: auto;
+    list-style: none;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
+}
+.selector-lista li { margin: 0; }
+.selector-lista > li.selector-elegido {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    background: var(--surface-2);
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+}
+.selector-vacio { padding: 0.5rem; color: var(--ink-soft); font-size: 0.85rem; }
+.nota-pts { color: var(--ink-soft); font-size: 0.8rem; white-space: nowrap; }
+
+.selector-lista button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 2rem;
+    padding: 0.3rem 0.5rem;
+    background: transparent;
+    color: var(--ink);
+    border: 0;
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+}
+.selector-lista button:hover:not(:disabled) { background: var(--surface-2); }
+.selector-lista button:disabled { opacity: 0.55; cursor: default; }
+.selector-lista button[aria-pressed="true"],
+.selector-lista button[aria-pressed="true"]:hover:not(:disabled) {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+.selector-lista .selector-quitar {
+    width: auto;
+    min-height: 1.6rem;
+    padding: 0 0.5rem;
+    color: var(--err-ink);
+    border: 1px solid var(--err-line);
+}
+.selector-lista .selector-quitar:hover:not(:disabled) { background: var(--err-bg); }
+
+/* Foto de perfil (menú y tarjetas del buscador) */
+.avatar {
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    object-fit: cover;
+    background: var(--surface-2);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+}
+.ticket-profesional { display: flex; align-items: center; gap: 0.5rem; }

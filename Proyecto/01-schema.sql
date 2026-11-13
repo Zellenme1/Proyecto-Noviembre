@@ -21,7 +21,9 @@ CREATE TABLE usuarios (
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     -- AÑADIDO respecto al Anexo: borrado lógico para la baja de usuarios.
     -- Evita que ON DELETE CASCADE destruya el historial de trueques.
-    activo BOOLEAN NOT NULL DEFAULT TRUE
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    -- Ruta pública de la foto de perfil (opcional), p. ej. /uploads/avatars/u5_ab12cd.jpg
+    foto VARCHAR(255) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE servicios (

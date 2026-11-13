@@ -84,7 +84,10 @@ function renderizar() {
             <div class="ticket-cuerpo">
                 <h4>${escapeHTML(o.servicio_nombre)}</h4>
                 <p class="ticket-categoria">${escapeHTML(o.categoria_nombre)}</p>
-                <p>Lo ofrece <strong>${escapeHTML(o.profesional)}</strong></p>
+                <p class="ticket-profesional">
+                    ${o.foto ? `<img class="avatar" src="${escapeHTML(o.foto)}" alt="" loading="lazy">` : ''}
+                    <span>Lo ofrece <strong>${escapeHTML(o.profesional)}</strong></span>
+                </p>
                 ${o.descripcion_personal ? `<p class="ticket-desc">${escapeHTML(o.descripcion_personal)}</p>` : ''}
                 <div class="acciones">${accionDe(o)}</div>
             </div>

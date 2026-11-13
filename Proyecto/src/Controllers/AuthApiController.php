@@ -5,11 +5,16 @@ namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Csrf;
+use App\DAO\Database;
+use App\DAO\OfertaDAO;
 use App\DAO\UsuarioDAO;
 use App\Models\Usuario;
 
 /**
  * Endpoints: POST /api/login, POST /api/logout, POST /api/registro, GET /api/me
+ *
+ * El registro admite una lista opcional de servicios ("servicios": [ids]) que el
+ * nuevo profesional ofrece desde el primer día, con la tarifa de referencia.
  */
 class AuthApiController extends ApiController
 {
@@ -17,11 +22,15 @@ class AuthApiController extends ApiController
     // para que el tiempo de respuesta no revele qué emails están registrados.
     private const HASH_RELLENO = '$2y$10$jffo5kO6QP4AdaemjQwnv.VoHCC4aaraUQbg4R9QEEUMOO5H9VMS2';
 
+    private const MAX_SERVICIOS_REGISTRO = 20;
+
     private UsuarioDAO $usuarioDAO;
+    private OfertaDAO $ofertaDAO;
 
     public function __construct()
     {
         $this->usuarioDAO = new UsuarioDAO();
+        $this->ofertaDAO = new OfertaDAO();
     }
 
     public function login(): void
@@ -92,6 +101,26 @@ class AuthApiController extends ApiController
             $errores['telefono'] = 'El teléfono no tiene un formato válido';
         }
 
+        // Servicios que ofrece desde el primer día (opcional): lista de ids sin repetir.
+        $idsServicios = [];
+        $bruto = $in['servicios'] ?? [];
+        if (!is_array($bruto)) {
+            $errores['servicios'] = 'La lista de servicios no es válida';
+        } else {
+            foreach ($bruto as $valor) {
+                $idServicio = filter_var($valor, FILTER_VALIDATE_INT);
+                if ($idServicio === false || $idServicio < 1) {
+                    $errores['servicios'] = 'La lista de servicios no es válida';
+                    break;
+                }
+                $idsServicios[$idServicio] = $idServicio;
+            }
+            $idsServicios = array_values($idsServicios);
+            if (count($idsServicios) > self::MAX_SERVICIOS_REGISTRO) {
+                $errores['servicios'] = 'Puedes elegir como máximo ' . self::MAX_SERVICIOS_REGISTRO . ' servicios';
+            }
+        }
+
         if (!isset($errores['email']) && $this->usuarioDAO->emailExists($email)) {
             $this->jsonResponse(['error' => 'Ya existe una cuenta con ese email', 'errores' => ['email' => 'Email ya registrado']], 409);
         }
@@ -113,15 +142,35 @@ class AuthApiController extends ApiController
             Usuario::PUNTOS_BIENVENIDA
         );
 
+        // Usuario y ofertas se guardan juntos: o entra todo o no entra nada.
+        $pdo = Database::getInstance()->getConnection();
+        $pdo->beginTransaction();
         try {
             $id = $this->usuarioDAO->create($nuevo);
+            $creadas = $this->ofertaDAO->crearVarias($id, $idsServicios);
         } catch (\PDOException $e) {
-            if ($e->getCode() === '23000') { // email duplicado por carrera entre dos registros
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            if ($e->getCode() === '23000' && str_contains($e->getMessage(), 'email')) {
+                // email duplicado por carrera entre dos registros
                 $this->jsonResponse(['error' => 'Ya existe una cuenta con ese email'], 409);
             }
             throw $e;
         }
 
-        $this->jsonResponse(['usuario' => $this->usuarioDAO->getById($id)], 201);
+        if ($creadas !== count($idsServicios)) { // alguno de los servicios ya no existe
+            $pdo->rollBack();
+            $this->jsonResponse([
+                'error' => 'Datos no válidos',
+                'errores' => ['servicios' => 'Alguno de los servicios elegidos ya no existe. Recarga la página'],
+            ], 422);
+        }
+        $pdo->commit();
+
+        $this->jsonResponse([
+            'usuario' => $this->usuarioDAO->getById($id),
+            'servicios_creados' => $creadas,
+        ], 201);
     }
 }

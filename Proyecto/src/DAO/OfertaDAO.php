@@ -16,7 +16,8 @@ class OfertaDAO
     private const SELECT = 'SELECT o.id_oferta, o.id_profesional, o.id_servicio, o.puntos_hora,
                                    o.descripcion_personal, s.nombre AS servicio_nombre,
                                    s.id_categoria, c.nombre AS categoria_nombre,
-                                   u.nombre AS profesional_nombre, u.apellidos AS profesional_apellidos
+                                   u.nombre AS profesional_nombre, u.apellidos AS profesional_apellidos,
+                                   u.foto AS profesional_foto
                             FROM ofertas_profesionales o
                             INNER JOIN servicios s ON s.id_servicio = o.id_servicio
                             INNER JOIN categorias c ON c.id_categoria = s.id_categoria
@@ -70,6 +71,30 @@ class OfertaDAO
         return $row ? $this->mapToArray($row) : null;
     }
 
+    /**
+     * Da de alta varias ofertas de golpe para un profesional, con la tarifa de
+     * referencia de cada servicio. Los ids que no existan simplemente no se crean:
+     * quien llama compara el número devuelto con los que pidió.
+     *
+     * @param int[] $idsServicio
+     * @return int cuántas ofertas se han creado
+     */
+    public function crearVarias(int $idProfesional, array $idsServicio): int
+    {
+        if ($idsServicio === []) {
+            return 0;
+        }
+
+        $marcadores = implode(',', array_fill(0, count($idsServicio), '?'));
+        $stmt = $this->db->prepare(
+            'INSERT INTO ofertas_profesionales (id_profesional, id_servicio, puntos_hora)
+             SELECT ' . $idProfesional . ', id_servicio, puntos_hora_referencia
+             FROM servicios WHERE id_servicio IN (' . $marcadores . ')'
+        );
+        $stmt->execute(array_values($idsServicio));
+        return $stmt->rowCount();
+    }
+
     /** @return array<string, mixed> */
     private function mapToArray(array $row): array
     {
@@ -83,6 +108,7 @@ class OfertaDAO
             'profesional' => trim($row['profesional_nombre'] . ' ' . $row['profesional_apellidos']),
             'puntos_hora' => (int)$row['puntos_hora'],
             'descripcion_personal' => $row['descripcion_personal'],
+            'foto' => $row['profesional_foto'],
         ];
     }
 }
