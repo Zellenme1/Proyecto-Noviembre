@@ -9,31 +9,26 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="{% block body_class %}{% endblock %}">
-    {# Menú principal: los enlaces cambian según haya sesión y según el rol. #}
-    {% set enlaces = [
-        {href: '/', texto: 'Inicio'},
-        {href: '/buscar', texto: 'Buscar servicio'}
-    ] %}
-    {% if usuario and usuario.rol == 'ADMIN' %}
-        {% set enlaces = enlaces|merge([{href: '/servicios-spa', texto: 'Catálogo'}]) %}
-    {% elseif usuario %}
-        {% set enlaces = enlaces|merge([{href: '/solicitudes', texto: 'Mis solicitudes'}]) %}
-    {% else %}
-        {% set enlaces = enlaces|merge([
-            {href: '/login', texto: 'Iniciar sesión'},
-            {href: '/registro', texto: 'Registrarse', clase: 'enlace-destacado'}
-        ]) %}
-    {% endif %}
-
     <header>
         <h1><a href="/">Ego pro te, tu pro me</a></h1>
 
+        {# Menú: lo primero es igual para todos; el final depende de quién entra. #}
         <nav class="principal" aria-label="Principal">
-            {% for enlace in enlaces %}
-                <a href="{{ enlace.href }}"
-                   {% if enlace.clase is defined %}class="{{ enlace.clase }}"{% endif %}
-                   {% if ruta_actual == enlace.href %}aria-current="page"{% endif %}>{{ enlace.texto }}</a>
-            {% endfor %}
+            <a href="/">Inicio</a>
+            <a href="/buscar">Buscar servicio</a>
+
+            {% if usuario is null %}
+                <a href="/login">Iniciar sesión</a>
+                <a href="/registro" class="enlace-destacado">Registrarse</a>
+            {% elseif usuario.rol == 'ADMIN' %}
+                <a href="/servicios-spa">Catálogo</a>
+            {% else %}
+                <a href="/solicitudes">Mis solicitudes</a>
+            {% endif %}
+
+            {% if usuario %}
+                <a href="/perfil">Mi perfil</a>
+            {% endif %}
         </nav>
 
         {% if usuario %}

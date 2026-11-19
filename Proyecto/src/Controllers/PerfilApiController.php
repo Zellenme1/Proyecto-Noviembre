@@ -82,4 +82,33 @@ class PerfilApiController extends ApiController
             default => 'No se pudo subir la foto',
         };
     }
+
+    public function actualizar(): void
+    {
+        $usuario = Auth::requireLogin();
+        $in = $this->readJsonBody();
+
+        $nombre = is_string($in['nombre'] ?? null) ? trim($in['nombre']) : '';
+        $apellidos = is_string($in['apellidos'] ?? null) ? trim($in['apellidos']) : '';
+        $telefono = is_string($in['telefono'] ?? null) ? trim($in['telefono']) : '';
+
+        $errores = [];
+        if ($nombre === '' || mb_strlen($nombre) > 100) {
+            $errores['nombre'] = 'El nombre es obligatorio (máximo 100 caracteres)';
+        }
+        if ($apellidos === '' || mb_strlen($apellidos) > 100) {
+            $errores['apellidos'] = 'Los apellidos son obligatorios (máximo 100 caracteres)';
+        }
+        if ($telefono !== '' && !preg_match('/^[0-9 +()\-]{6,20}$/', $telefono)) {
+            $errores['telefono'] = 'El teléfono no tiene un formato válido';
+        }
+        if ($errores) {
+            $this->jsonResponse(['error' => 'Datos no válidos', 'errores' => $errores], 422);
+        }
+
+        $id = (int)$usuario->getId();
+        $this->usuarioDAO->actualizarDatos($id, $nombre, $apellidos, $telefono === '' ? null : $telefono);
+
+        $this->jsonResponse(['usuario' => $this->usuarioDAO->getById($id)]);
+    }
 }

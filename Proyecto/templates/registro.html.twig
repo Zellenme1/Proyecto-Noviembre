@@ -2,7 +2,7 @@
 
 {% block title %}{{ titulo_pagina }}{% endblock %}
 
-{% block body_class %}pagina-login pagina-registro{% endblock %}
+{% block body_class %}pagina-login{% endblock %}
 
 {% block content %}
     <section class="container">
@@ -36,36 +36,34 @@
                 <input type="password" id="password2" name="password2" maxlength="72" autocomplete="new-password" required>
             </div>
 
-            <fieldset class="selector-servicios">
-                <legend>Servicios que ofreces <span class="ayuda">(opcional)</span></legend>
-                <p class="ayuda">Elige una categoría y pulsa los servicios que sabes hacer: se añadirán a tu lista. Los ofrecerás desde el primer día con la tarifa de referencia.</p>
-
-                <div class="selector-columnas">
-                    <div class="selector-columna">
-                        <p class="selector-titulo" id="titulo-categorias">Categorías</p>
-                        <ul class="selector-lista" id="lista-categorias" aria-labelledby="titulo-categorias">
-                            <li class="selector-vacio">Cargando…</li>
-                        </ul>
-                    </div>
-                    <div class="selector-columna">
-                        <p class="selector-titulo" id="titulo-servicios">Servicios</p>
-                        <ul class="selector-lista" id="lista-servicios" aria-labelledby="titulo-servicios">
-                            <li class="selector-vacio">Elige una categoría</li>
-                        </ul>
-                    </div>
-                    <div class="selector-columna">
-                        <p class="selector-titulo" id="titulo-seleccion">Servicios seleccionados</p>
-                        <ul class="selector-lista" id="lista-seleccion" aria-labelledby="titulo-seleccion" aria-live="polite">
-                            <li class="selector-vacio">Todavía no has elegido ninguno</li>
-                        </ul>
-                    </div>
-                </div>
-            </fieldset>
+            {# Servicios que ofrece desde el primer día: una casilla por servicio, agrupados por categoría #}
+            <div>
+                <p class="etiqueta">Servicios que ofreces <span class="ayuda">(opcional)</span></p>
+                <p class="ayuda">Marca los que sabes hacer. Los ofrecerás desde el primer día con la tarifa de referencia.</p>
+            </div>
+            {% for grupo in grupos %}
+                <fieldset class="grupo-servicios">
+                    <legend>{{ grupo.categoria.nombre }}</legend>
+                    {% for servicio in grupo.servicios %}
+                        <label>
+                            <input type="checkbox" name="servicios" value="{{ servicio.id }}">
+                            <span>{{ servicio.nombre }}</span>
+                            <span class="nota-pts">{{ servicio.puntosHoraReferencia }} pts/h</span>
+                        </label>
+                    {% endfor %}
+                </fieldset>
+            {% else %}
+                <p class="ayuda">Todavía no hay servicios en el catálogo. Podrás añadirlos más adelante.</p>
+            {% endfor %}
 
             <div>
                 <label for="foto">Foto de perfil (opcional)</label>
                 <input type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/webp">
                 <p class="ayuda">JPG, PNG o WEBP, hasta 2 MB.</p>
+            </div>
+
+            <div>
+                
             </div>
 
             <button type="submit" id="btn-registrar">Crear cuenta</button>

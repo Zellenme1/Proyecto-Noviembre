@@ -9,173 +9,102 @@ use App\Controllers\OfertaApiController;
 use App\Controllers\PaginaController;
 use App\Controllers\PerfilApiController;
 use App\Controllers\ServicioApiController;
-use App\Controllers\ServicioWebController;
 use App\Controllers\SolicitudApiController;
+use App\Controllers\ValoracionApiController;
 
+/**
+ * El Router mira qué ha pedido el navegador (método + URL) y llama al método
+ * del controlador que toca. Todas las rutas de la aplicación están en RUTAS:
+ * para añadir una página o un endpoint solo hay que añadir una línea.
+ */
 class Router
 {
+    /**
+     * [método HTTP, URL, controlador, método del controlador]
+     * "{id}" es un número de la URL que se pasa al método del controlador.
+     */
+    private const RUTAS = [
+        // ---- Páginas (devuelven HTML)
+        ['GET', '/',              PaginaController::class, 'inicio'],
+        ['GET', '/login',         PaginaController::class, 'login'],
+        ['GET', '/registro',      PaginaController::class, 'registro'],
+        ['GET', '/buscar',        PaginaController::class, 'buscar'],
+        ['GET', '/solicitudes',   PaginaController::class, 'solicitudes'],
+        ['GET', '/servicios-spa', PaginaController::class, 'catalogo'],
+        ['GET', '/perfil', PaginaController::class, 'Perfil'],
+
+        // ---- API de cuenta (devuelven JSON)
+        ['POST', '/api/login',    AuthApiController::class, 'login'],
+        ['POST', '/api/logout',   AuthApiController::class, 'logout'],
+        ['POST', '/api/registro', AuthApiController::class, 'registro'],
+
+        ['POST', '/api/foto',     PerfilApiController::class, 'subirFoto'],
+        ['PUT', '/api/perfil', PerfilApiController::class, 'actualizar'],
+
+        // ---- API pública: filtro y buscador
+        ['GET', '/api/categorias', CategoriaApiController::class, 'index'],
+        ['GET', '/api/ofertas',    OfertaApiController::class,    'index'],
+        ['GET', '/api/ofertas',    OfertaApiController::class,    'index'],
+        ['GET', '/api/profesionales/{id}/resenas', ValoracionApiController::class, 'index'],
+
+        // ---- API del catálogo de servicios (escribir: solo ADMIN)
+        ['GET',    '/api/servicios',      ServicioApiController::class, 'index'],
+        ['GET',    '/api/servicios/{id}', ServicioApiController::class, 'show'],
+        ['POST',   '/api/servicios',      ServicioApiController::class, 'store'],
+        ['PUT',    '/api/servicios/{id}', ServicioApiController::class, 'update'],
+        ['DELETE', '/api/servicios/{id}', ServicioApiController::class, 'destroy'],
+
+        // ---- API de solicitudes (solo PROFESIONAL)
+        ['GET',  '/api/solicitudes',      SolicitudApiController::class, 'index'],
+        ['POST', '/api/solicitudes',      SolicitudApiController::class, 'store'],
+        ['PUT',  '/api/solicitudes/{id}', SolicitudApiController::class, 'update'],
+    ];
+
     public function dispatch(): void
     {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $metodo = $_SERVER['REQUEST_METHOD'];
+        $url = rtrim((string)parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') ?: '/';
 
-        // Ejemplo: '/api/servicios/5' -> ['api', 'servicios', '5']
-        $segments = array_values(array_filter(explode('/', $uri)));
-        $primerSegmento = $segments[0] ?? '';
+        $urlConocida = false;
 
-        switch ($primerSegmento) {
-            case 'api':
-                $this->despacharApi($method, $segments);
-                break;
+        foreach (self::RUTAS as [$metodoRuta, $patron, $controlador, $accion]) {
+            // "/api/servicios/{id}" se convierte en la expresión "#^/api/servicios/(\d+)$#"
+            $regex = '#^' . str_replace('{id}', '(\d+)', $patron) . '$#';
+            if (!preg_match($regex, $url, $coincidencias)) {
+                continue;
+            }
 
-            case '':
-                $this->soloGet($method);
-                (new PaginaController())->inicio();
-                break;
+            $urlConocida = true;
+            if ($metodoRuta !== $metodo) {
+                continue; // la URL existe, pero no para este método
+            }
 
-            case 'login':
-                $this->soloGet($method);
-                (new PaginaController())->login();
-                break;
+            // CSRF: toda petición que modifica datos debe llevar el token de la sesión.
+            if ($metodo !== 'GET' && !Auth::csrfIsValid()) {
+                $this->error($url, 403, 'Token CSRF no válido o ausente');
+            }
 
-            case 'registro':
-                $this->soloGet($method);
-                (new PaginaController())->registro();
-                break;
-
-            case 'buscar':
-                $this->soloGet($method);
-                (new PaginaController())->buscar();
-                break;
-
-            case 'solicitudes':
-                $this->soloGet($method);
-                (new PaginaController())->solicitudes();
-                break;
-
-            case 'servicios-spa':
-                $this->soloGet($method);
-                (new ServicioWebController())->spa();
-                break;
-
-            default:
-                $this->responderError(404, 'Ruta no encontrada');
-        }
-    }
-
-    private function despacharApi(string $method, array $segments): void
-    {
-        // CSRF: toda petición que modifica datos debe llevar el token de la sesión.
-        if (!in_array($method, ['GET', 'HEAD', 'OPTIONS'], true) && !Csrf::isValid()) {
-            $this->responderError(403, 'Token CSRF no válido o ausente');
+            $parametros = array_map('intval', array_slice($coincidencias, 1));
+            (new $controlador())->$accion(...$parametros);
+            return;
         }
 
-        $recurso = $segments[1] ?? null;
-        $id = isset($segments[2]) ? (int)$segments[2] : null;
-
-        switch ($recurso) {
-            case 'login':
-                $this->soloMetodo($method, 'POST');
-                (new AuthApiController())->login();
-                break;
-
-            case 'logout':
-                $this->soloMetodo($method, 'POST');
-                (new AuthApiController())->logout();
-                break;
-
-            case 'registro':
-                $this->soloMetodo($method, 'POST');
-                (new AuthApiController())->registro();
-                break;
-
-            case 'me':
-                $this->soloMetodo($method, 'GET');
-                (new AuthApiController())->me();
-                break;
-
-            case 'servicios':
-                $controller = new ServicioApiController();
-
-                switch ($method) {
-                    case 'GET':
-                        $id !== null ? $controller->show($id) : $controller->index();
-                        break;
-                    case 'POST':
-                        $controller->store();
-                        break;
-                    case 'PUT':
-                        $id !== null
-                            ? $controller->update($id)
-                            : $this->responderError(400, 'Falta el ID en la URI para actualizar');
-                        break;
-                    case 'DELETE':
-                        $id !== null
-                            ? $controller->destroy($id)
-                            : $this->responderError(400, 'Falta el ID en la URI para eliminar');
-                        break;
-                    default:
-                        $this->responderError(405, 'Método HTTP no soportado');
-                }
-                break;
-
-            case 'foto':
-                $this->soloMetodo($method, 'POST');
-                (new PerfilApiController())->subirFoto();
-                break;
-
-            case 'categorias':
-                $this->soloMetodo($method, 'GET');
-                (new CategoriaApiController())->index();
-                break;
-
-            case 'ofertas':
-                $this->soloMetodo($method, 'GET');
-                (new OfertaApiController())->index();
-                break;
-
-            case 'solicitudes':
-                $controller = new SolicitudApiController();
-
-                switch ($method) {
-                    case 'GET':
-                        $controller->index();
-                        break;
-                    case 'POST':
-                        $controller->store();
-                        break;
-                    case 'PUT':
-                        $id !== null && $id > 0
-                            ? $controller->update($id)
-                            : $this->responderError(400, 'Falta el ID en la URI para actualizar');
-                        break;
-                    default:
-                        $this->responderError(405, 'Método HTTP no soportado');
-                }
-                break;
-
-            default:
-                $this->responderError(404, 'Recurso API no encontrado');
+        if ($urlConocida) {
+            $this->error($url, 405, 'Método HTTP no soportado');
         }
+        $this->error($url, 404, 'Ruta no encontrada');
     }
 
-    private function soloGet(string $method): void
+    /** La API responde con JSON; las páginas, con una pantalla de error. */
+    private function error(string $url, int $codigo, string $mensaje): never
     {
-        $this->soloMetodo($method, 'GET');
-    }
-
-    private function soloMetodo(string $method, string $permitido): void
-    {
-        if ($method !== $permitido) {
-            $this->responderError(405, 'Método HTTP no soportado');
+        if (!str_starts_with($url, '/api/')) {
+            (new PaginaController())->error($codigo, $mensaje);
         }
-    }
 
-    private function responderError(int $code, string $message): never
-    {
-        http_response_code($code);
+        http_response_code($codigo);
         header('Content-Type: application/json; charset=UTF-8');
-        echo json_encode(['error' => $message], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['error' => $mensaje], JSON_UNESCAPED_UNICODE);
         exit;
     }
 }

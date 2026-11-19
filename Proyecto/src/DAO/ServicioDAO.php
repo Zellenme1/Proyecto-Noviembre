@@ -39,16 +39,6 @@ class ServicioDAO
         return $row ? $this->mapToObject($row) : null;
     }
 
-    /** @return Servicio[] */
-    public function getByCategoria(int $idCategoria): array
-    {
-        $stmt = $this->db->prepare(
-            self::SELECT . ' WHERE s.id_categoria = :id_categoria ORDER BY s.nombre'
-        );
-        $stmt->execute([':id_categoria' => $idCategoria]);
-        return array_map(fn(array $row) => $this->mapToObject($row), $stmt->fetchAll());
-    }
-
     /** Devuelve el id del servicio creado. */
     public function create(Servicio $servicio): int
     {

@@ -60,11 +60,54 @@ class UsuarioDAO
         return (int)$this->db->lastInsertId();
     }
 
+    /**
+     * Crea el usuario y las ofertas con las que empieza, todo en una transacción:
+     * o se guarda todo o no se guarda nada.
+     *
+     * @param int[] $idsServicio servicios del catálogo que ofrece desde el primer día
+     * @return int|null el id del usuario, o null si algún servicio no existe (no se guarda nada)
+     */
+    public function registrar(Usuario $usuario, array $idsServicio): ?int
+    {
+        $this->db->beginTransaction();
+        try {
+            $id = $this->create($usuario);
+            $creadas = (new OfertaDAO($this->db))->crearVarias($id, $idsServicio);
+
+            if ($creadas !== count($idsServicio)) {
+                $this->db->rollBack();
+                return null;
+            }
+            $this->db->commit();
+            return $id;
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
     /** Guarda la ruta pública de la foto de perfil (o NULL para quitarla). */
     public function actualizarFoto(int $idUsuario, ?string $ruta): void
     {
         $stmt = $this->db->prepare('UPDATE usuarios SET foto = :foto WHERE id_usuario = :id');
         $stmt->execute([':foto' => $ruta, ':id' => $idUsuario]);
+    }
+
+    public function actualizarDatos(int $idUsuario, string $nombre, string $apellidos, ?string $telefono): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE usuarios
+            SET nombre = :nombre, apellidos = :apellidos, telefono = :telefono
+            WHERE id_usuario = :id'
+        );
+        $stmt->execute([
+            ':nombre' =>  $nombre,
+            ':apellidos' => $apellidos,
+            ':telefono' => $telefono,
+            ':id'  => $idUsuario,
+        ]);
     }
 
     private function mapToObject(array $row): Usuario

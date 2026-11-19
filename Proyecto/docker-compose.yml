@@ -28,8 +28,20 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./02-seeds.sql:/docker-entrypoint-initdb.d/02-seeds.sql
+      # Todo lo que haya en db/ se ejecuta, por orden de nombre, al crear la base por primera vez
+      - ./db:/docker-entrypoint-initdb.d
+
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: usuario_trueque
+      PMA_PASSWORD: password_secret
+    depends_on:
+      - db
 
 volumes:
   db_data:
