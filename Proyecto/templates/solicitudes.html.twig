@@ -1,0 +1,29 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+    <section class="container" id="app-solicitudes">
+        <h2>Mis solicitudes</h2>
+
+        <p id="mensaje" role="status" aria-live="polite" hidden></p>
+
+        <div class="columnas-solicitudes">
+            <section aria-labelledby="titulo-recibidas">
+                <h3 id="titulo-recibidas">Recibidas</h3>
+                <p class="ayuda">Otros profesionales te piden estos servicios.</p>
+                <div id="lista-recibidas"><p>Cargando…</p></div>
+            </section>
+
+            <section aria-labelledby="titulo-enviadas">
+                <h3 id="titulo-enviadas">Enviadas</h3>
+                <p class="ayuda">Servicios que has pedido tú. <a href="/buscar">Buscar otro servicio</a></p>
+                <div id="lista-enviadas"><p>Cargando…</p></div>
+            </section>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    <script type="module" src="/js/solicitudes.js"></script>
+{% endblock %}

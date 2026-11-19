@@ -1,0 +1,78 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block body_class %}pagina-login{% endblock %}
+
+{% block content %}
+    <section class="container">
+        <h2>Crear cuenta</h2>
+
+        <p id="mensaje" role="alert" hidden></p>
+
+        <form id="form-registro" novalidate>
+            <div>
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" maxlength="100" autocomplete="given-name" required>
+            </div>
+            <div>
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" name="apellidos" maxlength="100" autocomplete="family-name" required>
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" maxlength="150" autocomplete="username" required>
+            </div>
+            <div>
+                <label for="telefono">Teléfono (opcional)</label>
+                <input type="tel" id="telefono" name="telefono" maxlength="20" autocomplete="tel">
+            </div>
+            <div>
+                <label for="password">Contraseña (mínimo 8 caracteres)</label>
+                <input type="password" id="password" name="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+            </div>
+            <div>
+                <label for="password2">Repite la contraseña</label>
+                <input type="password" id="password2" name="password2" maxlength="72" autocomplete="new-password" required>
+            </div>
+
+            {# Servicios que ofrece desde el primer día: una casilla por servicio, agrupados por categoría #}
+            <div>
+                <p class="etiqueta">Servicios que ofreces <span class="ayuda">(opcional)</span></p>
+                <p class="ayuda">Marca los que sabes hacer. Los ofrecerás desde el primer día con la tarifa de referencia.</p>
+            </div>
+            {% for grupo in grupos %}
+                <fieldset class="grupo-servicios">
+                    <legend>{{ grupo.categoria.nombre }}</legend>
+                    {% for servicio in grupo.servicios %}
+                        <label>
+                            <input type="checkbox" name="servicios" value="{{ servicio.id }}">
+                            <span>{{ servicio.nombre }}</span>
+                            <span class="nota-pts">{{ servicio.puntosHoraReferencia }} pts/h</span>
+                        </label>
+                    {% endfor %}
+                </fieldset>
+            {% else %}
+                <p class="ayuda">Todavía no hay servicios en el catálogo. Podrás añadirlos más adelante.</p>
+            {% endfor %}
+
+            <div>
+                <label for="foto">Foto de perfil (opcional)</label>
+                <input type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/webp">
+                <p class="ayuda">JPG, PNG o WEBP, hasta 2 MB.</p>
+            </div>
+
+            <div>
+                
+            </div>
+
+            <button type="submit" id="btn-registrar">Crear cuenta</button>
+        </form>
+
+        <p class="aviso-alterno">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    <script type="module" src="/js/registro.js"></script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+    <section class="container">
+        <h2>Mi perfil</h2>
+
+        {% if usuario.foto %}
+            <img class="avatar" src="{{ usuario.foto }}" alt="Tu foto de perfil">
+        {% endif %}
+
+        <dl class="datos-perfil">
+            <dt>Email</dt>
+            <dd>{{ usuario.email }}</dd>
+
+            <dt>Tipo de cuenta</dt>
+            <dd>{{ usuario.rol == 'ADMIN' ? 'Administrador' : 'Profesional' }}</dd>
+
+            <dt>Saldo</dt>
+            <dd><span class="puntos">{{ usuario.puntosSaldo }} puntos</span></dd>
+
+            <dt>Miembro desde</dt>
+            <dd>{{ usuario.fechaRegistro|date('d/m/Y') }}</dd>
+        </dl>
+
+        {# ===== TROZO 1: la sección de reseñas, entre la lista y "Mis datos" ===== #}
+        {% if usuario.rol == 'PROFESIONAL' %}
+            <section id="resenas" data-profesional="{{ usuario.id }}" aria-labelledby="titulo-resenas">
+                <h3 id="titulo-resenas">Mis reseñas</h3>
+                <div id="resumen-resenas"></div>
+                <div id="lista-resenas"><p>Cargando…</p></div>
+            </section>
+        {% endif %}
+
+        <h3>Mis datos</h3>
+
+        <p id="mensaje" role="status" aria-live="polite" hidden></p>
+
+        <form id="form-perfil" novalidate>
+            <div>
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" value="{{ usuario.nombre }}" maxlength="100" autocomplete="given-name" required>
+            </div>
+            <div>
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" value="{{ usuario.apellidos }}" maxlength="100" autocomplete="family-name" required>
+            </div>
+            <div>
+                <label for="telefono">Teléfono (opcional)</label>
+                <input type="tel" id="telefono" value="{{ usuario.telefono }}" maxlength="20" autocomplete="tel">
+            </div>
+            <button type="submit">Guardar cambios</button>
+        </form>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    <script type="module" src="/js/perfil.js"></script>
+    <script type="module" src="/js/resenas.js"></script>
+{% endblock %}
