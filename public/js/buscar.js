@@ -86,7 +86,8 @@ function renderizar() {
                 <p class="ticket-categoria">${escapeHTML(o.categoria_nombre)}</p>
                 <p class="ticket-profesional">
                     ${o.foto ? `<img class="avatar" src="${escapeHTML(o.foto)}" alt="" loading="lazy">` : ''}
-                    <span>Lo ofrece <strong>${escapeHTML(o.profesional)}</strong></span>
+                    <span>Lo ofrece <strong><a href="/profesionales/${o.id_profesional}">${escapeHTML(o.profesional)}</a></strong></span>
+                    <a href="/profesionales/${o.id_profesional}">Ver perfil y reseñas</a>
                 </p>
                 ${o.descripcion_personal ? `<p class="ticket-desc">${escapeHTML(o.descripcion_personal)}</p>` : ''}
                 <div class="acciones">${accionDe(o)}</div>
@@ -130,7 +131,7 @@ function actualizarTotal() {
     textoTotal.textContent = String(total);
 }
 
-function abrirDialogo(idOferta) {
+async function abrirDialogo(idOferta) {
     const oferta = ofertas.find((o) => o.id_oferta === idOferta);
     if (!oferta || !dialogo) return;
 
@@ -140,13 +141,22 @@ function abrirDialogo(idOferta) {
     campoFecha.min = ahoraLocal();
     textoResumen.textContent =
         `${oferta.servicio_nombre} · ${oferta.profesional} · ${oferta.puntos_hora} puntos/hora`;
-    textoSaldo.textContent = `${app.dataset.saldo} puntos`;
+    textoSaldo.textContent = 'Consultando…';
     mensajeDialogo.hidden = true;
-    btnEnviar.disabled = false;
+    btnEnviar.disabled = true;
     actualizarTotal();
 
     dialogo.showModal();
     campoHoras.focus();
+
+    try {
+        const saldo = await fetchJSON('/api/puntos-disponibles');
+        textoSaldo.textContent = `${saldo.puntos_disponibles} puntos`;
+        btnEnviar.disabled = false;
+    } catch (error) {
+        mensajeDialogo.textContent = `No se pudo consultar tu saldo disponible: ${textoError(error)}`;
+        mensajeDialogo.hidden = false;
+    }
 }
 
 if (dialogo) {
@@ -159,7 +169,7 @@ if (dialogo) {
         btnEnviar.disabled = true;
 
         try {
-            await fetchJSON('/api/solicitudes', {
+            const resultado = await fetchJSON('/api/solicitudes', {
                 method: 'POST',
                 body: JSON.stringify({
                     id_oferta: Number.parseInt(campoOferta.value, 10),
@@ -167,6 +177,7 @@ if (dialogo) {
                     fecha_propuesta: campoFecha.value,
                 }),
             });
+            textoSaldo.textContent = `${resultado.puntos_disponibles} puntos`;
             dialogo.close();
             mostrarMensajeHTML('Solicitud enviada. El profesional la verá en su lista. <a href="/solicitudes">Ver mis solicitudes</a>');
         } catch (error) {
@@ -189,7 +200,7 @@ selectCategoria.addEventListener('change', buscar);
 
 lista.addEventListener('click', (e) => {
     const boton = e.target.closest('button.btn-solicitar');
-    if (boton) abrirDialogo(Number.parseInt(boton.dataset.id, 10));
+    if (boton) void abrirDialogo(Number.parseInt(boton.dataset.id, 10));
 });
 
 try {

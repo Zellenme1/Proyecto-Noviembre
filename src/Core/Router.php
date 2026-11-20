@@ -29,6 +29,7 @@ class Router
         ['GET', '/login',         PaginaController::class, 'login'],
         ['GET', '/registro',      PaginaController::class, 'registro'],
         ['GET', '/buscar',        PaginaController::class, 'buscar'],
+        ['GET', '/profesionales/{id}', PaginaController::class, 'perfilPublico'],
         ['GET', '/solicitudes',   PaginaController::class, 'solicitudes'],
         ['GET', '/servicios-spa', PaginaController::class, 'catalogo'],
         ['GET', '/perfil', PaginaController::class, 'Perfil'],
@@ -56,8 +57,13 @@ class Router
 
         // ---- API de solicitudes (solo PROFESIONAL)
         ['GET',  '/api/solicitudes',      SolicitudApiController::class, 'index'],
+        ['GET',  '/api/puntos-disponibles', SolicitudApiController::class, 'puntosDisponibles'],
         ['POST', '/api/solicitudes',      SolicitudApiController::class, 'store'],
         ['PUT',  '/api/solicitudes/{id}', SolicitudApiController::class, 'update'],
+
+        // ---- Reseñas de servicios completados (solo quien solicitó el trabajo)
+        ['POST', '/api/solicitudes/{id}/valoracion', ValoracionApiController::class, 'store'],
+        ['PUT',  '/api/solicitudes/{id}/valoracion', ValoracionApiController::class, 'update'],
     ];
 
     public function dispatch(): void

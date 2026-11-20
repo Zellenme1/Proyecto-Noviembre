@@ -58,6 +58,7 @@ CREATE TABLE solicitudes_trueque (
     confirmado_cliente BOOLEAN DEFAULT FALSE,
     confirmado_prestador BOOLEAN DEFAULT FALSE,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_completado DATETIME NULL,
     FOREIGN KEY (id_cliente) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_oferta) REFERENCES ofertas_profesionales(id_oferta) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

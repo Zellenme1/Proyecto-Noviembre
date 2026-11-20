@@ -5,8 +5,7 @@
 {% block content %}
     <section class="container buscador" id="app-buscar"
              data-usuario-id="{{ usuario ? usuario.id : '' }}"
-             data-rol="{{ usuario ? usuario.rol : '' }}"
-             data-saldo="{{ usuario ? usuario.puntosSaldo : 0 }}">
+             data-rol="{{ usuario ? usuario.rol : '' }}">
         <h2>Buscar servicio</h2>
         <p>Encuentra a un profesional y paga con tus puntos. Cada profesional fija cuántos puntos cobra por hora.</p>
 
@@ -48,7 +47,7 @@
                     <input type="datetime-local" id="fecha_propuesta" required>
                 </div>
 
-                <p>Coste: <span class="puntos" id="dialogo-total">0</span> puntos · Tu saldo: <strong id="dialogo-saldo"></strong></p>
+                <p>Coste: <span class="puntos" id="dialogo-total">0</span> puntos · Disponibles tras reservar solicitudes: <strong id="dialogo-saldo"></strong></p>
 
                 <div class="acciones">
                     <button type="submit" id="btn-enviar-solicitud">Enviar solicitud</button>

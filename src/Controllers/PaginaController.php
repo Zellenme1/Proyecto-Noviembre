@@ -6,6 +6,7 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\DAO\CategoriaDAO;
 use App\DAO\ServicioDAO;
+use App\DAO\UsuarioDAO;
 use App\Models\Usuario;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -40,6 +41,21 @@ class PaginaController
     public function buscar(): void
     {
         $this->render('buscar.html.twig', 'Buscar servicio');
+    }
+
+    public function perfilPublico(int $id): void
+    {
+        $profesional = (new UsuarioDAO())->getById($id);
+        if (
+            $profesional === null
+            || !$profesional->isActivo()
+            || $profesional->getRol() !== Usuario::ROL_PROFESIONAL
+        ) {
+            $this->error(404, 'Profesional no encontrado.');
+        }
+
+        $nombre = $profesional->getNombre() . ' ' . $profesional->getApellidos();
+        $this->render('perfil_publico.html.twig', $nombre, ['profesional' => $profesional]);
     }
 
     /** Solo para visitantes: con la sesión iniciada no tiene sentido. */
