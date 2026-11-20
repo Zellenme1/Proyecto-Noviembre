@@ -8,6 +8,8 @@
     --ink: black;
     --ink-soft: dimgray;
     --line: lightsteelblue;
+    --backdrop: black;
+    --transparent: transparent;
 
     --primary: midnightblue;
     --primary-hover: navy;
@@ -87,8 +89,8 @@ body > header {
     justify-content: space-between;
     gap: 0.5rem 1.5rem;
     padding: 0.7rem max(1rem, calc((100% - var(--width)) / 2));
-    background: midnightblue;
-    color: white;
+    background: var(--primary);
+    color: var(--on-primary);
 }
 body > header :focus-visible { outline-color: var(--accent); }
 
@@ -109,8 +111,8 @@ body > header h1 a::before {
     flex: none;
     border-radius: 50%;
     background:
-        linear-gradient(black, black) 50% 22% / 2px 32% no-repeat,
-        linear-gradient(black, black) 68% 50% / 28% 2px no-repeat,
+        linear-gradient(var(--on-accent), var(--on-accent)) 50% 22% / 2px 32% no-repeat,
+        linear-gradient(var(--on-accent), var(--on-accent)) 68% 50% / 28% 2px no-repeat,
         var(--accent);
 }
 
@@ -129,7 +131,7 @@ body > header nav.principal a {
     font-weight: 600;
     text-decoration: none;
 }
-body > header nav.principal a:hover { background: navy; }
+body > header nav.principal a:hover { background: var(--primary-hover); }
 body > header nav.principal a[aria-current="page"] { box-shadow: inset 0 -3px 0 var(--accent); }
 body > header nav.principal a.enlace-destacado { background: var(--accent); color: var(--on-accent); }
 body > header nav.principal a.enlace-destacado:hover { background: var(--accent-hover); }
@@ -201,8 +203,8 @@ button[type="submit"] {
 }
 button[type="submit"]:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 
-body > header button { background: transparent; color: white; border-color: white; min-height: 2.25rem; padding-block: 0.3rem; }
-body > header button:hover { background: navy; }
+body > header button { background: var(--transparent); color: var(--on-primary); border-color: var(--on-primary); min-height: 2.25rem; padding-block: 0.3rem; }
+body > header button:hover { background: var(--primary-hover); }
 
 .btn-eliminar { color: var(--err-ink); border-color: var(--err-line); }
 .btn-eliminar:hover { background: var(--err-bg); }
@@ -289,7 +291,7 @@ body > header button:hover { background: navy; }
     padding: 0.75rem 1rem;
     background: var(--accent);
     color: var(--on-accent);
-    border-left: 2px dashed black;
+    border-left: 2px dashed var(--ink);
     border-radius: 0 var(--radius) var(--radius) 0;
 }
 .ticket-talon strong { font-size: 1.9rem; line-height: 1; }
@@ -354,7 +356,7 @@ dialog {
     border: 1px solid var(--line);
     border-radius: var(--radius);
 }
-dialog::backdrop { background: black; opacity: 0.6; }
+dialog::backdrop { background: var(--backdrop); opacity: 0.6; }
 dialog form { border: 0; }
 
 .columnas-solicitudes { display: grid; gap: 2rem; }

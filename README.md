@@ -27,7 +27,11 @@ Cuando en el log salga `ready for connections` (de MySQL), abre **http://localho
 | Ver los errores de PHP                         | `docker compose logs web`                    |
 
 > Los scripts de `db/` solo se ejecutan cuando la base se crea. Si cambias
-> `db/01-schema.sql` o `db/02-seeds.sql`, hay que usar `down -v` para que se apliquen.
+> `db/01-schema.sql` o `db/02-seeds.sql`, recuerda que no se aplican a una base ya
+> creada. Para conservar sus datos, aplica los cambios de esquema desde phpMyAdmin;
+> `docker compose down -v` borra la base y debe reservarse para un reinicio deliberado.
+> La hora se registra en las nuevas finalizaciones; las solicitudes completadas
+> antes de añadir la columna no tienen una hora real que se pueda recuperar.
 
 ### Usuarios de prueba
 
@@ -57,6 +61,11 @@ Son cuentas de desarrollo: hay que cambiarlas o quitarlas antes de publicar nada
   valoración), **registrarse** (50 puntos de bienvenida, servicios que ofrece y foto opcionales) e iniciar sesión.
 - **Profesional:** todo lo anterior y **solicitar servicios** a otros profesionales, y en
   **Mis solicitudes** ver las que ha hecho y las que recibe, con aceptar, rechazar y cancelar.
+  Los puntos de las solicitudes sin completar se reservan para impedir que se comprometa
+  más saldo del disponible. Tras completar un servicio, quien lo solicitó puede dejar una
+  reseña y editarla después.
+  Al terminar un trabajo aceptado, el prestador puede marcarlo como hecho: el sistema
+  descuenta los puntos al cliente y los suma al prestador en una sola operación.
 - **Administrador:** gestionar el **catálogo de servicios** (crear, editar y borrar).
 
 ---

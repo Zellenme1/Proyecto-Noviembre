@@ -11,6 +11,7 @@ use App\Models\Usuario;
 /**
  * Endpoints (solo usuarios PROFESIONAL con sesión):
  *   GET  /api/solicitudes        -> {recibidas: [...], enviadas: [...]}
+ *   GET  /api/puntos-disponibles -> saldo menos puntos de solicitudes activas
  *   POST /api/solicitudes        -> crea una solicitud sobre una oferta
  *   PUT  /api/solicitudes/{id}   -> {accion: aceptar | rechazar | cancelar}
  */
@@ -34,6 +35,17 @@ class SolicitudApiController extends ApiController
             'recibidas' => $this->solicitudDAO->getRecibidas($id),
             'enviadas' => $this->solicitudDAO->getEnviadas($id),
         ]);
+    }
+
+    public function puntosDisponibles(): void
+    {
+        $usuario = Auth::requireRole(Usuario::ROL_PROFESIONAL);
+        $puntos = $this->solicitudDAO->getPuntosDisponibles((int)$usuario->getId());
+        if ($puntos === null) {
+            $this->jsonResponse(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        $this->jsonResponse(['puntos_disponibles' => $puntos]);
     }
 
     public function store(): void
@@ -71,28 +83,37 @@ class SolicitudApiController extends ApiController
         $puntos = 0;
         if (!$errores) {
             $puntos = (int)ceil(round($oferta['puntos_hora'] * $horas, 2));
-            $saldo = $usuario->getPuntosSaldo();
-            if ($puntos > $saldo) {
-                $errores['horas_estimadas'] = "Necesitas {$puntos} puntos y tu saldo es de {$saldo}";
-            }
         }
 
         if ($errores) {
             $this->jsonResponse(['error' => 'Datos no válidos', 'errores' => $errores], 422);
         }
 
-        $id = $this->solicitudDAO->create(
+        $resultado = $this->solicitudDAO->create(
             (int)$usuario->getId(),
             $oferta['id_oferta'],
             $horas,
             $puntos,
             $fecha->format('Y-m-d H:i:s')
         );
+        if ($resultado['resultado'] === 'saldo_insuficiente') {
+            $disponibles = $resultado['puntos_disponibles'];
+            $this->jsonResponse([
+                'error' => 'Datos no válidos',
+                'errores' => [
+                    'horas_estimadas' => "Necesitas {$puntos} puntos y tienes {$disponibles} disponibles después de reservar tus solicitudes sin completar",
+                ],
+            ], 422);
+        }
+        if ($resultado['resultado'] !== 'creada') {
+            $this->jsonResponse(['error' => 'No se pudo crear la solicitud'], 404);
+        }
 
         $this->jsonResponse([
             'message' => 'Solicitud enviada',
-            'id_solicitud' => $id,
+            'id_solicitud' => $resultado['id_solicitud'],
             'puntos_totales' => $puntos,
+            'puntos_disponibles' => $resultado['puntos_disponibles'],
         ], 201);
     }
 
@@ -110,6 +131,30 @@ class SolicitudApiController extends ApiController
         // Si no es parte de la solicitud se responde 404 para no revelar que existe.
         if ($solicitud === null || (!$esCliente && !$esPrestador)) {
             $this->jsonResponse(['error' => 'Solicitud no encontrada'], 404);
+        }
+
+        if ($accion === 'completar') {
+            if (!$esPrestador) {
+                $this->jsonResponse(['error' => 'Solo el profesional puede marcar el servicio como hecho'], 403);
+            }
+            if (!in_array($solicitud['estado'], ['ACEPTADO', 'EN_EJECUCION'], true)) {
+                $this->jsonResponse(['error' => 'La solicitud no está en curso'], 409);
+            }
+
+            $resultado = $this->solicitudDAO->completar($id, (int)$yo);
+            if ($resultado['resultado'] === 'saldo_insuficiente') {
+                $this->jsonResponse(['error' => 'El cliente ya no tiene puntos suficientes para completar el servicio'], 409);
+            }
+            if ($resultado['resultado'] !== 'completado') {
+                $this->jsonResponse(['error' => 'La solicitud ya no está disponible para completar'], 409);
+            }
+
+            $this->jsonResponse([
+                'message' => 'Servicio completado y puntos transferidos',
+                'estado' => 'COMPLETADO',
+                'puntos_transferidos' => $resultado['puntos_transferidos'],
+                'puntos_saldo' => $resultado['puntos_saldo_profesional'],
+            ]);
         }
 
         // acción => [¿puede hacerla este usuario?, estados desde los que vale, estado nuevo]
