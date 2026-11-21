@@ -13,7 +13,7 @@ use App\Models\Usuario;
  *   GET  /api/solicitudes        -> {recibidas: [...], enviadas: [...]}
  *   GET  /api/puntos-disponibles -> saldo menos puntos de solicitudes activas
  *   POST /api/solicitudes        -> crea una solicitud sobre una oferta
- *   PUT  /api/solicitudes/{id}   -> {accion: aceptar | rechazar | cancelar}
+ *   PUT  /api/solicitudes/{id}   -> {accion: aceptar | rechazar | cancelar, motivo_cancelacion?: string}
  */
 class SolicitudApiController extends ApiController
 {
@@ -176,7 +176,25 @@ class SolicitudApiController extends ApiController
         if (!in_array($solicitud['estado'], $estadosValidos, true)) {
             $this->jsonResponse(['error' => 'La solicitud ya no está en un estado que permita esta acción'], 409);
         }
-        if (!$this->solicitudDAO->cambiarEstado($id, $solicitud['estado'], $estadoNuevo)) {
+        $motivoCancelacion = null;
+        if ($accion === 'cancelar') {
+            $motivoCancelacion = is_string($in['motivo_cancelacion'] ?? null)
+                ? trim($in['motivo_cancelacion'])
+                : '';
+            if ($motivoCancelacion === '' || mb_strlen($motivoCancelacion) > 1000) {
+                $this->jsonResponse([
+                    'error' => 'Indica el motivo de la cancelación (máximo 1000 caracteres)',
+                    'errores' => ['motivo_cancelacion' => 'El motivo es obligatorio y no puede superar los 1000 caracteres'],
+                ], 422);
+            }
+        }
+
+        if (!$this->solicitudDAO->cambiarEstado(
+            $id,
+            $solicitud['estado'],
+            $estadoNuevo,
+            $motivoCancelacion
+        )) {
             $this->jsonResponse(['error' => 'La solicitud ha cambiado mientras la mirabas. Recarga la página'], 409);
         }
 

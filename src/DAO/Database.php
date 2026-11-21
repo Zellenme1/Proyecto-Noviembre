@@ -28,6 +28,35 @@ class Database
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 ]
             );
+            $comprobacion = $this->connection->prepare(
+                'SELECT COUNT(*)
+                 FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = :tabla
+                   AND COLUMN_NAME = :columna'
+            );
+            $comprobacion->execute([
+                ':tabla' => 'usuarios',
+                ':columna' => 'curriculum',
+            ]);
+
+            if ((int)$comprobacion->fetchColumn() === 0) {
+                $this->connection->exec(
+                    'ALTER TABLE usuarios
+                     ADD COLUMN curriculum VARCHAR(255) NULL'
+                );
+            }
+
+            $comprobacion->execute([
+                ':tabla' => 'solicitudes_trueque',
+                ':columna' => 'motivo_cancelacion',
+            ]);
+            if ((int)$comprobacion->fetchColumn() === 0) {
+                $this->connection->exec(
+                    'ALTER TABLE solicitudes_trueque
+                     ADD COLUMN motivo_cancelacion TEXT NULL'
+                );
+            }
         } catch (PDOException $e) {
             // El detalle (host, usuario...) va al log del servidor, nunca al cliente.
             error_log('Error de conexión a la BD: ' . $e->getMessage());

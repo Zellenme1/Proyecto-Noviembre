@@ -39,8 +39,25 @@
                 <input type="hidden" id="id_oferta">
 
                 <div>
-                    <label for="horas_estimadas">Horas estimadas</label>
-                    <input type="number" id="horas_estimadas" min="0.5" max="24" step="0.5" value="1" required>
+                    <p class="etiqueta">Duración estimada</p>
+                    <div class="duracion-estimada">
+                        <div>
+                            <label for="duracion-horas">Horas</label>
+                            <select id="duracion-horas">
+                                {% for hora in 0..24 %}
+                                    <option value="{{ hora }}" {% if hora == 1 %}selected{% endif %}>{{ hora }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="duracion-minutos">Minutos</label>
+                            <select id="duracion-minutos">
+                                <option value="0" selected>00</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="ayuda">Elige una duración de 30 minutos a 24 horas, en intervalos de media hora.</p>
                 </div>
                 <div>
                     <label for="fecha_propuesta">Fecha y hora que propones</label>
@@ -59,5 +76,5 @@
 {% endblock %}
 
 {% block javascript %}
-    <script type="module" src="/js/buscar.js"></script>
+    <script type="module" src="/js/buscar.js?v=20261121-2"></script>
 {% endblock %}

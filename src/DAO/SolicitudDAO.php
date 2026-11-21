@@ -16,6 +16,7 @@ class SolicitudDAO
 {
     private const SELECT_LISTA = 'SELECT st.id_solicitud, st.horas_estimadas, st.puntos_totales,
                                          st.fecha_propuesta, st.fecha_completado, st.estado,
+                                         st.motivo_cancelacion,
                                          st.confirmado_cliente, st.confirmado_prestador,
                                          v.id_valoracion, v.puntuacion AS resena_puntuacion,
                                          v.comentario AS resena_comentario,
@@ -174,13 +175,24 @@ class SolicitudDAO
      * Cambia el estado solo si sigue siendo el esperado (evita pisar un cambio
      * hecho a la vez por la otra parte). Devuelve true si se actualizó.
      */
-    public function cambiarEstado(int $id, string $estadoActual, string $estadoNuevo): bool
+    public function cambiarEstado(
+        int $id,
+        string $estadoActual,
+        string $estadoNuevo,
+        ?string $motivoCancelacion = null
+    ): bool
     {
         $stmt = $this->db->prepare(
-            'UPDATE solicitudes_trueque SET estado = :nuevo
+            'UPDATE solicitudes_trueque
+             SET estado = :nuevo, motivo_cancelacion = :motivo_cancelacion
              WHERE id_solicitud = :id AND estado = :actual'
         );
-        $stmt->execute([':nuevo' => $estadoNuevo, ':id' => $id, ':actual' => $estadoActual]);
+        $stmt->execute([
+            ':nuevo' => $estadoNuevo,
+            ':motivo_cancelacion' => $motivoCancelacion,
+            ':id' => $id,
+            ':actual' => $estadoActual,
+        ]);
         return $stmt->rowCount() === 1;
     }
 
@@ -285,6 +297,7 @@ class SolicitudDAO
             'horas_estimadas' => (float)$row['horas_estimadas'],
             'puntos_totales' => (int)$row['puntos_totales'],
             'fecha_propuesta' => $row['fecha_propuesta'],
+            'motivo_cancelacion' => $row['motivo_cancelacion'],
             'fecha_completado' => $row['fecha_completado'],
             'estado' => $row['estado'],
             'id_valoracion' => $row['id_valoracion'] === null ? null : (int)$row['id_valoracion'],

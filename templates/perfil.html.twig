@@ -11,8 +11,17 @@
         {% endif %}
 
         <dl class="datos-perfil">
+            <dt>Nombre</dt>
+            <dd>{{ usuario.nombre }}</dd>
+
+            <dt>Apellidos</dt>
+            <dd>{{ usuario.apellidos }}</dd>
+
             <dt>Email</dt>
             <dd>{{ usuario.email }}</dd>
+
+            <dt>Teléfono</dt>
+            <dd>{{ usuario.telefono ?: 'No indicado' }}</dd>
 
             <dt>Tipo de cuenta</dt>
             <dd>{{ usuario.rol == 'ADMIN' ? 'Administrador' : 'Profesional' }}</dd>
@@ -22,9 +31,13 @@
 
             <dt>Miembro desde</dt>
             <dd>{{ usuario.fechaRegistro|date('d/m/Y') }}</dd>
+
+            {% if usuario.curriculum %}
+                <dt>Currículum</dt>
+                <dd><a href="{{ usuario.curriculum }}" target="_blank" rel="noopener">Ver currículum</a></dd>
+            {% endif %}
         </dl>
 
-        {# ===== TROZO 1: la sección de reseñas, entre la lista y "Mis datos" ===== #}
         {% if usuario.rol == 'PROFESIONAL' %}
             <section id="resenas" data-profesional="{{ usuario.id }}" aria-labelledby="titulo-resenas">
                 <h3 id="titulo-resenas">Mis reseñas</h3>
@@ -33,29 +46,22 @@
             </section>
         {% endif %}
 
-        <h3>Mis datos</h3>
-
-        <p id="mensaje" role="status" aria-live="polite" hidden></p>
-
-        <form id="form-perfil" novalidate>
-            <div>
-                <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" value="{{ usuario.nombre }}" maxlength="100" autocomplete="given-name" required>
-            </div>
-            <div>
-                <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" value="{{ usuario.apellidos }}" maxlength="100" autocomplete="family-name" required>
-            </div>
-            <div>
-                <label for="telefono">Teléfono (opcional)</label>
-                <input type="tel" id="telefono" value="{{ usuario.telefono }}" maxlength="20" autocomplete="tel">
-            </div>
-            <button type="submit">Guardar cambios</button>
-        </form>
+        <section aria-labelledby="titulo-eliminar-cuenta">
+            <h3 id="titulo-eliminar-cuenta">Eliminar cuenta</h3>
+            <p>La cuenta se desactivará y no podrás volver a iniciar sesión. Tus solicitudes y reseñas se conservarán en el historial.</p>
+            <p id="mensaje" role="status" aria-live="polite" hidden></p>
+            <form id="form-eliminar-cuenta">
+                <div>
+                    <label for="password-confirmacion">Confirma tu contraseña para continuar</label>
+                    <input type="password" id="password-confirmacion" name="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn-eliminar">Eliminar mi cuenta</button>
+            </form>
+        </section>
     </section>
 {% endblock %}
 
 {% block javascript %}
-    <script type="module" src="/js/perfil.js"></script>
+    <script type="module" src="/js/perfil.js?v=20261121-2"></script>
     <script type="module" src="/js/resenas.js"></script>
 {% endblock %}

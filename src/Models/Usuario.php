@@ -20,7 +20,8 @@ class Usuario implements \JsonSerializable
         private int $puntosSaldo,
         private ?string $fechaRegistro = null,
         private bool $activo = true,
-        private ?string $foto = null
+        private ?string $foto = null,
+        private ?string $curriculum = null
     ) {
     }
 
@@ -35,6 +36,7 @@ class Usuario implements \JsonSerializable
     public function getFechaRegistro(): ?string { return $this->fechaRegistro; }
     public function isActivo(): bool { return $this->activo; }
     public function getFoto(): ?string { return $this->foto; }
+    public function getCurriculum(): ?string { return $this->curriculum; }
 
     /** Nunca incluye el hash de la contraseña. */
     public function jsonSerialize(): array
@@ -49,6 +51,7 @@ class Usuario implements \JsonSerializable
             'puntos_saldo' => $this->puntosSaldo,
             'fecha_registro' => $this->fechaRegistro,
             'foto' => $this->foto,
+            'curriculum' => $this->curriculum,
         ];
     }
 }

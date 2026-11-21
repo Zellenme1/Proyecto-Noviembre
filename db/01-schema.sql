@@ -23,7 +23,9 @@ CREATE TABLE usuarios (
     -- Evita que ON DELETE CASCADE destruya el historial de trueques.
     activo BOOLEAN NOT NULL DEFAULT TRUE,
     -- Ruta pública de la foto de perfil (opcional), p. ej. /uploads/avatars/u5_ab12cd.jpg
-    foto VARCHAR(255) NULL
+    foto VARCHAR(255) NULL,
+    -- Ruta pública del currículum (opcional), p. ej. /uploads/curriculum/u5_ab12cd.pdf
+    curriculum VARCHAR(255) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE servicios (
@@ -59,6 +61,7 @@ CREATE TABLE solicitudes_trueque (
     confirmado_prestador BOOLEAN DEFAULT FALSE,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     fecha_completado DATETIME NULL,
+    motivo_cancelacion TEXT NULL,
     FOREIGN KEY (id_cliente) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_oferta) REFERENCES ofertas_profesionales(id_oferta) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

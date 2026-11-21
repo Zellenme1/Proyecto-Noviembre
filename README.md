@@ -148,7 +148,7 @@ plantilla Twig; los datos de la pantalla los pide después el JavaScript con `fe
 - Todas las consultas SQL son preparadas (PDO).
 - Los datos que decide el servidor no se aceptan del cliente: rol, puntos de bienvenida,
   puntos de cada solicitud y quién es el usuario.
-- Las fotos se validan por su contenido real (no por la extensión), con tamaño máximo,
+- Las fotos y currículums se validan por su contenido real (no solo por la extensión), con tamaño máximo,
   y se guardan con un nombre aleatorio.
 - Las bajas de usuarios (`activo = 0`) cierran la sesión al instante y el usuario deja
   de salir en el buscador.

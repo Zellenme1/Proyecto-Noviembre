@@ -1,13 +1,15 @@
 // =============================================================================
 // Registro. Pasos: crear la cuenta (con los servicios marcados) -> iniciar
-// sesión -> subir la foto (si hay). La foto va al final porque para subirla
-// hace falta tener la sesión iniciada.
+// sesión -> subir la foto y el currículum (si existen). Los archivos van al final
+// porque para subirlos hace falta tener la sesión iniciada.
 // =============================================================================
 
 import { fetchJSON, textoError } from './api.js';
 
 const MAX_FOTO_BYTES = 2 * 1024 * 1024;
+const MAX_CURRICULUM_BYTES = 5 * 1024 * 1024;
 const TIPOS_FOTO = ['image/jpeg', 'image/png', 'image/webp'];
+const EXTENSIONES_CURRICULUM = ['pdf', 'doc', 'docx'];
 
 const form = document.getElementById('form-registro');
 const mensaje = document.getElementById('mensaje');
@@ -27,6 +29,7 @@ form.addEventListener('submit', async (e) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const foto = document.getElementById('foto').files[0] ?? null;
+    const curriculum = document.getElementById('curriculum').files[0] ?? null;
 
     // Se comprueba todo lo que se puede antes de crear nada, para no dejar la cuenta a medias.
     if (password !== document.getElementById('password2').value) {
@@ -37,6 +40,15 @@ form.addEventListener('submit', async (e) => {
     }
     if (foto && foto.size > MAX_FOTO_BYTES) {
         return mostrarError('La foto no puede superar los 2 MB');
+    }
+    if (curriculum) {
+        const extension = curriculum.name.split('.').pop()?.toLowerCase();
+        if (!EXTENSIONES_CURRICULUM.includes(extension)) {
+            return mostrarError('El currículum debe ser PDF, DOC o DOCX');
+        }
+        if (curriculum.size > MAX_CURRICULUM_BYTES) {
+            return mostrarError('El currículum no puede superar los 5 MB');
+        }
     }
 
     // Los servicios son las casillas marcadas
@@ -69,8 +81,19 @@ form.addEventListener('submit', async (e) => {
             datos.append('foto', foto);
             await fetchJSON('/api/foto', { method: 'POST', body: datos });
         } catch (error) {
-            // La cuenta ya existe y tiene sesión: se avisa y se continúa igualmente.
             mostrarError(`Tu cuenta está creada, pero no se pudo subir la foto: ${error.message}`);
+            boton.disabled = true;
+            return setTimeout(() => window.location.assign(sesion.redirect), 3500);
+        }
+    }
+
+    if (curriculum) {
+        try {
+            const datos = new FormData();
+            datos.append('curriculum', curriculum);
+            await fetchJSON('/api/curriculum', { method: 'POST', body: datos });
+        } catch (error) {
+            mostrarError(`Tu cuenta está creada, pero no se pudo subir el currículum: ${error.message}`);
             boton.disabled = true;
             return setTimeout(() => window.location.assign(sesion.redirect), 3500);
         }

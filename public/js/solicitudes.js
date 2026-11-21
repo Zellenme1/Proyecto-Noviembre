@@ -34,6 +34,18 @@ function accionesDe(s, tipo) {
     return '';
 }
 
+function formularioCancelacion(id) {
+    return `
+        <form class="form-cancelacion" data-id="${id}">
+            <label for="motivo-cancelacion-${id}">Motivo de cancelación</label>
+            <textarea id="motivo-cancelacion-${id}" name="motivo_cancelacion" maxlength="1000" rows="3" required></textarea>
+            <div class="acciones">
+                <button type="submit" class="btn-eliminar">Confirmar cancelación</button>
+                <button type="button" data-cancelacion-cerrar data-id="${id}">Volver</button>
+            </div>
+        </form>`;
+}
+
 function bloqueResena(s, tipo) {
     if (tipo !== 'enviadas' || s.estado !== 'COMPLETADO') return '';
 
@@ -75,6 +87,9 @@ function tarjeta(s, tipo) {
     const fechaCompletado = s.fecha_completado
         ? `<p class="ticket-desc">Completada: ${escapeHTML(formatearFecha(s.fecha_completado))}</p>`
         : '';
+    const motivoCancelacion = s.estado === 'CANCELADO' && s.motivo_cancelacion
+        ? `<p class="ticket-desc"><strong>Motivo de cancelación:</strong> ${escapeHTML(s.motivo_cancelacion)}</p>`
+        : '';
 
     return `
         <li class="ticket">
@@ -84,6 +99,7 @@ function tarjeta(s, tipo) {
                 <p>${quien}: <strong>${escapeHTML(s.otra_persona)}</strong></p>
                 <p class="ticket-desc">${escapeHTML(formatearFecha(s.fecha_propuesta))} · ${escapeHTML(horas)} h</p>
                 ${fechaCompletado}
+                ${motivoCancelacion}
                 ${bloqueResena(s, tipo)}
                 ${acciones ? `<div class="acciones">${acciones}</div>` : ''}
             </div>
@@ -124,13 +140,27 @@ const TEXTO_OK = {
 };
 
 async function onClick(e) {
+    const botonVolver = e.target.closest('button[data-cancelacion-cerrar]');
+    if (botonVolver) {
+        const { id } = botonVolver.dataset;
+        const formulario = botonVolver.closest('form.form-cancelacion');
+        if (formulario) {
+            formulario.outerHTML = `<button type="button" class="btn-eliminar" data-accion="cancelar" data-id="${id}">Cancelar solicitud</button>`;
+        }
+        return;
+    }
+
     const boton = e.target.closest('button[data-accion]');
     if (!boton) return;
 
     const { accion, id } = boton.dataset;
 
+    if (accion === 'cancelar') {
+        boton.outerHTML = formularioCancelacion(id);
+        document.getElementById(`motivo-cancelacion-${id}`)?.focus();
+        return;
+    }
     if (accion === 'rechazar' && !confirm('¿Rechazar esta solicitud?')) return;
-    if (accion === 'cancelar' && !confirm('¿Cancelar esta solicitud?')) return;
     if (accion === 'completar'
         && !confirm(`Al marcarlo como hecho, se transferirán ${boton.dataset.puntos} puntos del cliente a tu saldo. ¿Continuar?`)) return;
 
@@ -149,6 +179,35 @@ async function onClick(e) {
         mostrarMensaje(textoError(error), 'error');
     }
     await cargar();
+}
+
+async function onCancelSubmit(e) {
+    const formulario = e.target.closest('form.form-cancelacion');
+    if (!formulario) return;
+    e.preventDefault();
+
+    const campoMotivo = formulario.querySelector('textarea[name="motivo_cancelacion"]');
+    const motivo = campoMotivo.value.trim();
+    if (!motivo) {
+        campoMotivo.setCustomValidity('Escribe el motivo de la cancelación.');
+        campoMotivo.reportValidity();
+        return;
+    }
+    campoMotivo.setCustomValidity('');
+
+    const boton = formulario.querySelector('button[type="submit"]');
+    boton.disabled = true;
+    try {
+        await fetchJSON(`/api/solicitudes/${formulario.dataset.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ accion: 'cancelar', motivo_cancelacion: motivo }),
+        });
+        mostrarMensaje('Solicitud cancelada. El motivo se ha enviado a la otra persona.');
+        await cargar();
+    } catch (error) {
+        mostrarMensaje(textoError(error), 'error');
+        boton.disabled = false;
+    }
 }
 
 function onReviewClick(e) {
@@ -195,6 +254,7 @@ async function onReviewSubmit(e) {
 
 listaRecibidas.addEventListener('click', onClick);
 listaEnviadas.addEventListener('click', onClick);
+listaEnviadas.addEventListener('submit', onCancelSubmit);
 listaEnviadas.addEventListener('click', onReviewClick);
 listaEnviadas.addEventListener('submit', onReviewSubmit);
 

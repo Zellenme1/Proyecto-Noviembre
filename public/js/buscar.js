@@ -20,7 +20,8 @@ const mensaje = document.getElementById('mensaje');
 const dialogo = document.getElementById('dialogo-solicitud');
 const formSolicitud = document.getElementById('form-solicitud');
 const campoOferta = document.getElementById('id_oferta');
-const campoHoras = document.getElementById('horas_estimadas');
+const campoDuracionHoras = document.getElementById('duracion-horas');
+const campoDuracionMinutos = document.getElementById('duracion-minutos');
 const campoFecha = document.getElementById('fecha_propuesta');
 const textoResumen = document.getElementById('dialogo-resumen');
 const textoTotal = document.getElementById('dialogo-total');
@@ -124,11 +125,18 @@ function ofertaElegida() {
 /** Mismo cálculo que el servidor: puntos/hora x horas, redondeado hacia arriba. */
 function actualizarTotal() {
     const oferta = ofertaElegida();
-    const horas = Number.parseFloat(campoHoras.value);
-    const total = oferta && horas > 0
+    const horas = obtenerDuracionHoras();
+    const total = oferta && horas !== null
         ? Math.ceil(Math.round(oferta.puntos_hora * horas * 100) / 100)
         : 0;
     textoTotal.textContent = String(total);
+}
+
+function obtenerDuracionHoras() {
+    const horas = Number.parseInt(campoDuracionHoras.value, 10);
+    const minutos = Number.parseInt(campoDuracionMinutos.value, 10);
+    const duracion = horas + minutos / 60;
+    return duracion >= 0.5 && duracion <= 24 ? duracion : null;
 }
 
 async function abrirDialogo(idOferta) {
@@ -136,7 +144,8 @@ async function abrirDialogo(idOferta) {
     if (!oferta || !dialogo) return;
 
     campoOferta.value = String(oferta.id_oferta);
-    campoHoras.value = '1';
+    campoDuracionHoras.value = '1';
+    campoDuracionMinutos.value = '0';
     campoFecha.value = '';
     campoFecha.min = ahoraLocal();
     textoResumen.textContent =
@@ -147,7 +156,7 @@ async function abrirDialogo(idOferta) {
     actualizarTotal();
 
     dialogo.showModal();
-    campoHoras.focus();
+    campoDuracionHoras.focus();
 
     try {
         const saldo = await fetchJSON('/api/puntos-disponibles');
@@ -160,7 +169,8 @@ async function abrirDialogo(idOferta) {
 }
 
 if (dialogo) {
-    campoHoras.addEventListener('input', actualizarTotal);
+    campoDuracionHoras.addEventListener('change', actualizarTotal);
+    campoDuracionMinutos.addEventListener('change', actualizarTotal);
     btnCerrar.addEventListener('click', () => dialogo.close());
 
     formSolicitud.addEventListener('submit', async (e) => {
@@ -168,12 +178,20 @@ if (dialogo) {
         mensajeDialogo.hidden = true;
         btnEnviar.disabled = true;
 
+        const horasEstimadas = obtenerDuracionHoras();
+        if (horasEstimadas === null) {
+            mensajeDialogo.textContent = 'Elige una duración de al menos 30 minutos y como máximo 24 horas.';
+            mensajeDialogo.hidden = false;
+            btnEnviar.disabled = false;
+            return;
+        }
+
         try {
             const resultado = await fetchJSON('/api/solicitudes', {
                 method: 'POST',
                 body: JSON.stringify({
                     id_oferta: Number.parseInt(campoOferta.value, 10),
-                    horas_estimadas: Number.parseFloat(campoHoras.value),
+                    horas_estimadas: horasEstimadas,
                     fecha_propuesta: campoFecha.value,
                 }),
             });

@@ -40,11 +40,11 @@ class Router
         ['POST', '/api/registro', AuthApiController::class, 'registro'],
 
         ['POST', '/api/foto',     PerfilApiController::class, 'subirFoto'],
-        ['PUT', '/api/perfil', PerfilApiController::class, 'actualizar'],
+        ['POST', '/api/curriculum', PerfilApiController::class, 'subirCurriculum'],
+        ['DELETE', '/api/perfil', PerfilApiController::class, 'eliminarCuenta'],
 
         // ---- API pública: filtro y buscador
         ['GET', '/api/categorias', CategoriaApiController::class, 'index'],
-        ['GET', '/api/ofertas',    OfertaApiController::class,    'index'],
         ['GET', '/api/ofertas',    OfertaApiController::class,    'index'],
         ['GET', '/api/profesionales/{id}/resenas', ValoracionApiController::class, 'index'],
 

@@ -9,7 +9,7 @@ use PDO;
 class UsuarioDAO
 {
     private const COLUMNAS = 'id_usuario, nombre, apellidos, email, password, telefono,
-                              rol, puntos_saldo, fecha_registro, activo, foto';
+                              rol, puntos_saldo, fecha_registro, activo, foto, curriculum';
 
     private PDO $db;
 
@@ -95,19 +95,23 @@ class UsuarioDAO
         $stmt->execute([':foto' => $ruta, ':id' => $idUsuario]);
     }
 
-    public function actualizarDatos(int $idUsuario, string $nombre, string $apellidos, ?string $telefono): void
+    /** Guarda la ruta pública del currículum del usuario. */
+    public function actualizarCurriculum(int $idUsuario, ?string $ruta): void
+    {
+        $stmt = $this->db->prepare('UPDATE usuarios SET curriculum = :curriculum WHERE id_usuario = :id');
+        $stmt->execute([':curriculum' => $ruta, ':id' => $idUsuario]);
+    }
+
+    /** Desactiva la cuenta sin borrar sus solicitudes ni su historial. */
+    public function desactivar(int $idUsuario): bool
     {
         $stmt = $this->db->prepare(
             'UPDATE usuarios
-            SET nombre = :nombre, apellidos = :apellidos, telefono = :telefono
-            WHERE id_usuario = :id'
+             SET activo = 0
+             WHERE id_usuario = :id AND activo = 1'
         );
-        $stmt->execute([
-            ':nombre' =>  $nombre,
-            ':apellidos' => $apellidos,
-            ':telefono' => $telefono,
-            ':id'  => $idUsuario,
-        ]);
+        $stmt->execute([':id' => $idUsuario]);
+        return $stmt->rowCount() === 1;
     }
 
     private function mapToObject(array $row): Usuario
@@ -123,7 +127,8 @@ class UsuarioDAO
             (int)$row['puntos_saldo'],
             $row['fecha_registro'],
             (bool)(int)$row['activo'],
-            $row['foto']
+            $row['foto'],
+            $row['curriculum']
         );
     }
 }

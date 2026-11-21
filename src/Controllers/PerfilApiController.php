@@ -13,8 +13,10 @@ use App\DAO\UsuarioDAO;
 class PerfilApiController extends ApiController
 {
     private const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+    private const MAX_CURRICULUM_BYTES = 5 * 1024 * 1024; // 5 MB
     private const MAX_LADO = 4000;             // píxeles por lado
     private const CARPETA_PUBLICA = '/uploads/avatars/';
+    private const CARPETA_CURRICULUM = '/uploads/curriculum/';
 
     // Tipos admitidos. La extensión sale de aquí, nunca del nombre que envía el cliente.
     private const TIPOS = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
@@ -74,6 +76,78 @@ class PerfilApiController extends ApiController
         $this->jsonResponse(['foto' => self::CARPETA_PUBLICA . $nombre], 201);
     }
 
+    /** POST /api/curriculum: guarda PDF, DOC o DOCX del usuario con sesión iniciada. */
+    public function subirCurriculum(): void
+    {
+        $usuario = Auth::requireLogin();
+
+        $archivo = $_FILES['curriculum'] ?? null;
+        $codigo = is_array($archivo) ? (int)($archivo['error'] ?? UPLOAD_ERR_NO_FILE) : UPLOAD_ERR_NO_FILE;
+        if ($codigo !== UPLOAD_ERR_OK) {
+            $this->jsonResponse(['error' => $this->mensajeDeCurriculum($codigo)], 422);
+        }
+        if ($archivo['size'] > self::MAX_CURRICULUM_BYTES) {
+            $this->jsonResponse(['error' => 'El currículum no puede superar los 5 MB'], 422);
+        }
+        if (!is_uploaded_file($archivo['tmp_name'])) {
+            $this->jsonResponse(['error' => 'Archivo no válido'], 400);
+        }
+
+        $nombreOriginal = (string)($archivo['name'] ?? '');
+        $extension = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if (!in_array($extension, ['pdf', 'doc', 'docx'], true)) {
+            $this->jsonResponse(['error' => 'Solo se admiten currículums PDF, DOC o DOCX'], 422);
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($archivo['tmp_name']) ?: '';
+        $valido = match ($extension) {
+            'pdf' => $mime === 'application/pdf',
+            'doc' => in_array($mime, [
+                'application/msword',
+                'application/CDFV2',
+                'application/x-ole-storage',
+                'application/vnd.ms-word',
+            ], true),
+            'docx' => $mime === 'application/zip'
+                || $mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            default => false,
+        };
+        if (!$valido) {
+            $this->jsonResponse(['error' => 'El archivo no contiene un documento válido'], 422);
+        }
+
+        $carpeta = dirname(__DIR__, 2) . '/public' . self::CARPETA_CURRICULUM;
+        if (!is_dir($carpeta) && !mkdir($carpeta, 0755, true) && !is_dir($carpeta)) {
+            error_log('No se pudo crear la carpeta de currículums: ' . $carpeta);
+            $this->jsonResponse(['error' => 'No se pudo guardar el currículum'], 500);
+        }
+
+        $nombre = 'u' . $usuario->getId() . '_' . bin2hex(random_bytes(8)) . '.' . $extension;
+        if (!move_uploaded_file($archivo['tmp_name'], $carpeta . $nombre)) {
+            error_log('No se pudo mover el currículum subido a ' . $carpeta . $nombre);
+            $this->jsonResponse(['error' => 'No se pudo guardar el currículum'], 500);
+        }
+
+        $anterior = $usuario->getCurriculum();
+        $this->usuarioDAO->actualizarCurriculum((int)$usuario->getId(), self::CARPETA_CURRICULUM . $nombre);
+
+        if ($anterior !== null && str_starts_with($anterior, self::CARPETA_CURRICULUM)) {
+            @unlink($carpeta . basename($anterior));
+        }
+
+        $this->jsonResponse(['curriculum' => self::CARPETA_CURRICULUM . $nombre], 201);
+    }
+
+    private function mensajeDeCurriculum(int $codigo): string
+    {
+        return match ($codigo) {
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'El currículum es demasiado grande (máximo 5 MB)',
+            UPLOAD_ERR_NO_FILE => 'No se ha seleccionado ningún currículum',
+            default => 'No se pudo subir el currículum',
+        };
+    }
+
     private function mensajeDeSubida(int $codigo): string
     {
         return match ($codigo) {
@@ -83,32 +157,22 @@ class PerfilApiController extends ApiController
         };
     }
 
-    public function actualizar(): void
+    public function eliminarCuenta(): void
     {
         $usuario = Auth::requireLogin();
         $in = $this->readJsonBody();
+        $password = is_string($in['password'] ?? null) ? $in['password'] : '';
 
-        $nombre = is_string($in['nombre'] ?? null) ? trim($in['nombre']) : '';
-        $apellidos = is_string($in['apellidos'] ?? null) ? trim($in['apellidos']) : '';
-        $telefono = is_string($in['telefono'] ?? null) ? trim($in['telefono']) : '';
-
-        $errores = [];
-        if ($nombre === '' || mb_strlen($nombre) > 100) {
-            $errores['nombre'] = 'El nombre es obligatorio (máximo 100 caracteres)';
-        }
-        if ($apellidos === '' || mb_strlen($apellidos) > 100) {
-            $errores['apellidos'] = 'Los apellidos son obligatorios (máximo 100 caracteres)';
-        }
-        if ($telefono !== '' && !preg_match('/^[0-9 +()\-]{6,20}$/', $telefono)) {
-            $errores['telefono'] = 'El teléfono no tiene un formato válido';
-        }
-        if ($errores) {
-            $this->jsonResponse(['error' => 'Datos no válidos', 'errores' => $errores], 422);
+        if ($password === '' || !password_verify($password, $usuario->getPasswordHash())) {
+            $this->jsonResponse(['error' => 'La contraseña no es correcta'], 422);
         }
 
         $id = (int)$usuario->getId();
-        $this->usuarioDAO->actualizarDatos($id, $nombre, $apellidos, $telefono === '' ? null : $telefono);
+        if (!$this->usuarioDAO->desactivar($id)) {
+            $this->jsonResponse(['error' => 'No se pudo eliminar la cuenta'], 409);
+        }
 
-        $this->jsonResponse(['usuario' => $this->usuarioDAO->getById($id)]);
+        Auth::logout();
+        $this->jsonResponse(['message' => 'Cuenta eliminada']);
     }
 }
