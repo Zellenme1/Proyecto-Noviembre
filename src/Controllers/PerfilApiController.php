@@ -1,0 +1,178 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Core\Auth;
+use App\DAO\UsuarioDAO;
+
+/**
+ * POST /api/foto  (multipart/form-data, campo "foto")
+ * Guarda la foto de perfil del usuario con sesión iniciada.
+ */
+class PerfilApiController extends ApiController
+{
+    private const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+    private const MAX_CURRICULUM_BYTES = 5 * 1024 * 1024; // 5 MB
+    private const MAX_LADO = 4000;             // píxeles por lado
+    private const CARPETA_PUBLICA = '/uploads/avatars/';
+    private const CARPETA_CURRICULUM = '/uploads/curriculum/';
+
+    // Tipos admitidos. La extensión sale de aquí, nunca del nombre que envía el cliente.
+    private const TIPOS = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
+
+    private UsuarioDAO $usuarioDAO;
+
+    public function __construct()
+    {
+        $this->usuarioDAO = new UsuarioDAO();
+    }
+
+    public function subirFoto(): void
+    {
+        $usuario = Auth::requireLogin();
+
+        $archivo = $_FILES['foto'] ?? null;
+        $codigo = is_array($archivo) ? (int)($archivo['error'] ?? UPLOAD_ERR_NO_FILE) : UPLOAD_ERR_NO_FILE;
+        if ($codigo !== UPLOAD_ERR_OK) {
+            $this->jsonResponse(['error' => $this->mensajeDeSubida($codigo)], 422);
+        }
+        if ($archivo['size'] > self::MAX_BYTES) {
+            $this->jsonResponse(['error' => 'La foto no puede superar los 2 MB'], 422);
+        }
+        if (!is_uploaded_file($archivo['tmp_name'])) {
+            $this->jsonResponse(['error' => 'Archivo no válido'], 400);
+        }
+
+        // Se comprueba el contenido real del archivo, no su nombre ni el tipo que declara el navegador.
+        $info = @getimagesize($archivo['tmp_name']);
+        if ($info === false || !isset(self::TIPOS[$info[2]])) {
+            $this->jsonResponse(['error' => 'Solo se admiten imágenes JPG, PNG o WEBP'], 422);
+        }
+        if ($info[0] > self::MAX_LADO || $info[1] > self::MAX_LADO) {
+            $this->jsonResponse(['error' => 'La imagen es demasiado grande (máximo 4000 píxeles por lado)'], 422);
+        }
+
+        $carpeta = dirname(__DIR__, 2) . '/public' . self::CARPETA_PUBLICA;
+        if (!is_dir($carpeta) && !mkdir($carpeta, 0755, true) && !is_dir($carpeta)) {
+            error_log('No se pudo crear la carpeta de fotos: ' . $carpeta);
+            $this->jsonResponse(['error' => 'No se pudo guardar la foto'], 500);
+        }
+
+        $nombre = 'u' . $usuario->getId() . '_' . bin2hex(random_bytes(8)) . '.' . self::TIPOS[$info[2]];
+        if (!move_uploaded_file($archivo['tmp_name'], $carpeta . $nombre)) {
+            error_log('No se pudo mover la foto subida a ' . $carpeta . $nombre);
+            $this->jsonResponse(['error' => 'No se pudo guardar la foto'], 500);
+        }
+
+        $anterior = $usuario->getFoto();
+        $this->usuarioDAO->actualizarFoto((int)$usuario->getId(), self::CARPETA_PUBLICA . $nombre);
+
+        // Se borra la foto anterior para no acumular archivos huérfanos.
+        if ($anterior !== null && str_starts_with($anterior, self::CARPETA_PUBLICA)) {
+            @unlink($carpeta . basename($anterior));
+        }
+
+        $this->jsonResponse(['foto' => self::CARPETA_PUBLICA . $nombre], 201);
+    }
+
+    /** POST /api/curriculum: guarda PDF, DOC o DOCX del usuario con sesión iniciada. */
+    public function subirCurriculum(): void
+    {
+        $usuario = Auth::requireLogin();
+
+        $archivo = $_FILES['curriculum'] ?? null;
+        $codigo = is_array($archivo) ? (int)($archivo['error'] ?? UPLOAD_ERR_NO_FILE) : UPLOAD_ERR_NO_FILE;
+        if ($codigo !== UPLOAD_ERR_OK) {
+            $this->jsonResponse(['error' => $this->mensajeDeCurriculum($codigo)], 422);
+        }
+        if ($archivo['size'] > self::MAX_CURRICULUM_BYTES) {
+            $this->jsonResponse(['error' => 'El currículum no puede superar los 5 MB'], 422);
+        }
+        if (!is_uploaded_file($archivo['tmp_name'])) {
+            $this->jsonResponse(['error' => 'Archivo no válido'], 400);
+        }
+
+        $nombreOriginal = (string)($archivo['name'] ?? '');
+        $extension = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if (!in_array($extension, ['pdf', 'doc', 'docx'], true)) {
+            $this->jsonResponse(['error' => 'Solo se admiten currículums PDF, DOC o DOCX'], 422);
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($archivo['tmp_name']) ?: '';
+        $valido = match ($extension) {
+            'pdf' => $mime === 'application/pdf',
+            'doc' => in_array($mime, [
+                'application/msword',
+                'application/CDFV2',
+                'application/x-ole-storage',
+                'application/vnd.ms-word',
+            ], true),
+            'docx' => $mime === 'application/zip'
+                || $mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            default => false,
+        };
+        if (!$valido) {
+            $this->jsonResponse(['error' => 'El archivo no contiene un documento válido'], 422);
+        }
+
+        $carpeta = dirname(__DIR__, 2) . '/public' . self::CARPETA_CURRICULUM;
+        if (!is_dir($carpeta) && !mkdir($carpeta, 0755, true) && !is_dir($carpeta)) {
+            error_log('No se pudo crear la carpeta de currículums: ' . $carpeta);
+            $this->jsonResponse(['error' => 'No se pudo guardar el currículum'], 500);
+        }
+
+        $nombre = 'u' . $usuario->getId() . '_' . bin2hex(random_bytes(8)) . '.' . $extension;
+        if (!move_uploaded_file($archivo['tmp_name'], $carpeta . $nombre)) {
+            error_log('No se pudo mover el currículum subido a ' . $carpeta . $nombre);
+            $this->jsonResponse(['error' => 'No se pudo guardar el currículum'], 500);
+        }
+
+        $anterior = $usuario->getCurriculum();
+        $this->usuarioDAO->actualizarCurriculum((int)$usuario->getId(), self::CARPETA_CURRICULUM . $nombre);
+
+        if ($anterior !== null && str_starts_with($anterior, self::CARPETA_CURRICULUM)) {
+            @unlink($carpeta . basename($anterior));
+        }
+
+        $this->jsonResponse(['curriculum' => self::CARPETA_CURRICULUM . $nombre], 201);
+    }
+
+    private function mensajeDeCurriculum(int $codigo): string
+    {
+        return match ($codigo) {
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'El currículum es demasiado grande (máximo 5 MB)',
+            UPLOAD_ERR_NO_FILE => 'No se ha seleccionado ningún currículum',
+            default => 'No se pudo subir el currículum',
+        };
+    }
+
+    private function mensajeDeSubida(int $codigo): string
+    {
+        return match ($codigo) {
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'La foto es demasiado grande (máximo 2 MB)',
+            UPLOAD_ERR_NO_FILE => 'No se ha seleccionado ninguna foto',
+            default => 'No se pudo subir la foto',
+        };
+    }
+
+    public function eliminarCuenta(): void
+    {
+        $usuario = Auth::requireLogin();
+        $in = $this->readJsonBody();
+        $password = is_string($in['password'] ?? null) ? $in['password'] : '';
+
+        if ($password === '' || !password_verify($password, $usuario->getPasswordHash())) {
+            $this->jsonResponse(['error' => 'La contraseña no es correcta'], 422);
+        }
+
+        $id = (int)$usuario->getId();
+        if (!$this->usuarioDAO->desactivar($id)) {
+            $this->jsonResponse(['error' => 'No se pudo eliminar la cuenta'], 409);
+        }
+
+        Auth::logout();
+        $this->jsonResponse(['message' => 'Cuenta eliminada']);
+    }
+}

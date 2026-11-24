@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta name="color-scheme" content="light">
+    <title>{% block title %}Banco de Horas y Servicios{% endblock %}</title>
+    <link rel="stylesheet" href="/css/styles.css?v=20261121-7">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <header>
+        <h1><a href="/">Ego pro te, tu pro me</a></h1>
+
+        <button type="button" class="menu-toggle" id="btn-menu" aria-label="Abrir menú" aria-expanded="false" aria-controls="panel-menu">
+            <span class="icono-menu" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+
+        <div class="menu-movil" id="panel-menu" data-abierto="false">
+            {# Menú: lo primero es igual para todos; el final depende de quién entra. #}
+            <nav class="principal" aria-label="Principal">
+                <a href="/">Inicio</a>
+                <a href="/buscar">Buscar servicio</a>
+
+                {% if usuario is null %}
+                    <a href="/login">Iniciar sesión</a>
+                    <a href="/registro" class="enlace-destacado">Registrarse</a>
+                {% elseif usuario.rol == 'ADMIN' %}
+                    <a href="/servicios-spa">Catálogo</a>
+                {% else %}
+                    <a href="/solicitudes">Mis solicitudes</a>
+                {% endif %}
+
+                {% if usuario %}
+                    <a href="/perfil">Mi perfil</a>
+                {% endif %}
+            </nav>
+
+            {% if usuario %}
+                <div class="cuenta">
+                    {% if usuario.foto %}<img class="avatar" src="{{ usuario.foto }}" alt="">{% endif %}
+                    <span class="usuario">{{ usuario.nombre }}</span>
+                    <span class="saldo-pill" title="Tu saldo de puntos"><strong>{{ usuario.puntosSaldo }}</strong> puntos</span>
+                    <button type="button" id="btn-logout">Cerrar sesión</button>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="pie-pagina">
+        <p>© {{ "now"|date("Y") }} Ego pro te, tu pro me · Banco de Horas y Servicios</p>
+    </footer>
+
+    <script type="module" src="/js/layout.js?v=20261121-2"></script>
+    {% block javascript %}{% endblock %}
+</body>
+</html>

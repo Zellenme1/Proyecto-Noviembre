@@ -1,0 +1,23 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+    <section class="container">
+        <h2>{{ profesional.nombre }} {{ profesional.apellidos }}</h2>
+
+        {% if profesional.foto %}
+            <img class="avatar" src="{{ profesional.foto }}" alt="Foto de {{ profesional.nombre }}">
+        {% endif %}
+
+        <section id="resenas" data-profesional="{{ profesional.id }}" aria-labelledby="titulo-resenas">
+            <h3 id="titulo-resenas">Reseñas</h3>
+            <div id="resumen-resenas"></div>
+            <div id="lista-resenas"><p>Cargando reseñas…</p></div>
+        </section>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    <script type="module" src="/js/resenas.js"></script>
+{% endblock %}
