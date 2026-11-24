@@ -3,11 +3,13 @@ USE trueques_db;
 
 -- USUARIOS. Saldos coherentes con las solicitudes COMPLETADAS:
 -- 50 de bienvenida +/- puntos de los trueques. La suma de profesionales es 150.
-INSERT INTO usuarios (id_usuario, nombre, apellidos, email, password, telefono, rol, puntos_saldo) VALUES
-(1, 'Admin',  'Plataforma',     'admin@trueques.local',  '$2y$10$BRcm/4l1MTql8knudG3AC.D9mZm5lnxcIZ3pO.crn4C6y.xbb/t2W', '600000000', 'ADMIN',       0),
-(2, 'Laura',  'Gómez Ruiz',     'laura@trueques.local',  '$2y$10$jffo5kO6QP4AdaemjQwnv.VoHCC4aaraUQbg4R9QEEUMOO5H9VMS2', '600111111', 'PROFESIONAL', 47),
-(3, 'Carlos', 'Martínez Pérez', 'carlos@trueques.local', '$2y$10$jffo5kO6QP4AdaemjQwnv.VoHCC4aaraUQbg4R9QEEUMOO5H9VMS2', '600222222', 'PROFESIONAL', 65),
-(4, 'Marta',  'Sánchez López',  'marta@trueques.local',  '$2y$10$jffo5kO6QP4AdaemjQwnv.VoHCC4aaraUQbg4R9QEEUMOO5H9VMS2', '600333333', 'PROFESIONAL', 38);
+INSERT INTO usuarios (
+    id_usuario, nombre, apellidos, email, password, telefono, rol, puntos_saldo, foto, curriculum
+) VALUES
+(1, 'Admin',  'Plataforma',     'admin@trueques.local',  '$2y$10$BRcm/4l1MTql8knudG3AC.D9mZm5lnxcIZ3pO.crn4C6y.xbb/t2W', '600000000', 'ADMIN',       0, '/uploads/avatars/images.jpg',      '/uploads/curriculum/cv-demo-1.pdf'),
+(2, 'Laura',  'Gómez Ruiz',     'laura@trueques.local',  '$2y$10$jffo5kO6QP4AdaemjQwnv.VoHCC4aaraUQbg4R9QEEUMOO5H9VMS2', '600111111', 'PROFESIONAL', 47, '/uploads/avatars/images (2).jpg',  '/uploads/curriculum/cv-demo-2.pdf'),
+(3, 'Carlos', 'Martínez Pérez', 'carlos@trueques.local', '$2y$10$jffo5kO6QP4AdaemjQwnv.VoHCC4aaraUQbg4R9QEEUMOO5H9VMS2', '600222222', 'PROFESIONAL', 65, '/uploads/avatars/images (3).jpg',  '/uploads/curriculum/cv-demo-3.pdf'),
+(4, 'Marta',  'Sánchez López',  'marta@trueques.local',  '$2y$10$jffo5kO6QP4AdaemjQwnv.VoHCC4aaraUQbg4R9QEEUMOO5H9VMS2', '600333333', 'PROFESIONAL', 38, '/uploads/avatars/images (5).jpg',  '/uploads/curriculum/cv-demo-4.pdf');
 
 INSERT INTO categorias (id_categoria, nombre, descripcion) VALUES
 (1, 'Hogar y reparaciones',     'Fontanería, electricidad y pequeñas obras.'),

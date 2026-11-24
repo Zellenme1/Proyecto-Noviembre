@@ -101,6 +101,9 @@ La base de datos MySQL se publica también en el puerto `3306`.
 | Profesional | `carlos@trueques.local` | `Trueque1234!` |
 | Profesional | `marta@trueques.local` | `Trueque1234!` |
 
+Las cuentas de demostración tienen fotos asignadas al azar y currículums PDF ficticios
+para probar la interfaz; no representan datos profesionales reales.
+
 Estas cuentas son datos de prueba. Deben cambiarse o eliminarse antes de publicar la
 aplicación en un entorno real.
 
