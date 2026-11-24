@@ -1,4 +1,4 @@
--- El script comprueba que la columna no exista antes de ejecutar esta migración.
+-- El script comprueba que la columna no exista antes de ejecutar esta migracion.
 USE trueques_db;
 SET @columna_existe = (
     SELECT COUNT(*) FROM information_schema.COLUMNS

@@ -1,4 +1,4 @@
--- Añade el motivo de cancelación a solicitudes existentes.
+-- Anade el motivo de cancelacion a solicitudes existentes.
 USE trueques_db;
 SET @columna_existe = (
     SELECT COUNT(*) FROM information_schema.COLUMNS

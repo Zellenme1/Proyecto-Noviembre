@@ -19,12 +19,12 @@ CREATE TABLE usuarios (
     rol ENUM('ADMIN', 'PROFESIONAL') NOT NULL DEFAULT 'PROFESIONAL',
     puntos_saldo INT NOT NULL DEFAULT 50, -- Puntos de bienvenida por defecto
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    -- AÑADIDO respecto al Anexo: borrado lógico para la baja de usuarios.
+    -- ANADIDO respecto al Anexo: borrado logico para la baja de usuarios.
     -- Evita que ON DELETE CASCADE destruya el historial de trueques.
     activo BOOLEAN NOT NULL DEFAULT TRUE,
-    -- Ruta pública de la foto de perfil (opcional), p. ej. /uploads/avatars/u5_ab12cd.jpg
+    -- Ruta publica de la foto de perfil (opcional), p. ej. /uploads/avatars/u5_ab12cd.jpg
     foto VARCHAR(255) NULL,
-    -- Ruta pública del currículum (opcional), p. ej. /uploads/curriculum/u5_ab12cd.pdf
+    -- Ruta publica del curriculum (opcional), p. ej. /uploads/curriculum/u5_ab12cd.pdf
     curriculum VARCHAR(255) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
