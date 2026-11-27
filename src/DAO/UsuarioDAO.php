@@ -102,18 +102,6 @@ class UsuarioDAO
         $stmt->execute([':curriculum' => $ruta, ':id' => $idUsuario]);
     }
 
-    /** Desactiva la cuenta sin borrar sus solicitudes ni su historial. */
-    public function desactivar(int $idUsuario): bool
-    {
-        $stmt = $this->db->prepare(
-            'UPDATE usuarios
-             SET activo = 0
-             WHERE id_usuario = :id AND activo = 1'
-        );
-        $stmt->execute([':id' => $idUsuario]);
-        return $stmt->rowCount() === 1;
-    }
-
     private function mapToObject(array $row): Usuario
     {
         return new Usuario(

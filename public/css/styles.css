@@ -267,13 +267,6 @@ body > header button:hover { background: var(--primary-hover); }
     border-color: var(--err-line);
 }
 .form-cancelacion button[type="submit"]:hover { background: var(--err-bg); }
-#form-eliminar-cuenta button[type="submit"] {
-    background: var(--err-bg);
-    color: var(--err-ink);
-    border-color: var(--err-line);
-}
-#form-eliminar-cuenta button[type="submit"]:hover { background: var(--err-bg); }
-
 .enlace-boton {
     display: inline-flex;
     align-items: center;

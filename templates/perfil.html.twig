@@ -46,22 +46,9 @@
             </section>
         {% endif %}
 
-        <section aria-labelledby="titulo-eliminar-cuenta">
-            <h3 id="titulo-eliminar-cuenta">Eliminar cuenta</h3>
-            <p>La cuenta se desactivará y no podrás volver a iniciar sesión. Tus solicitudes y reseñas se conservarán en el historial.</p>
-            <p id="mensaje" role="status" aria-live="polite" hidden></p>
-            <form id="form-eliminar-cuenta">
-                <div>
-                    <label for="password-confirmacion">Confirma tu contraseña para continuar</label>
-                    <input type="password" id="password-confirmacion" name="password" autocomplete="current-password" required>
-                </div>
-                <button type="submit" class="btn-eliminar">Eliminar mi cuenta</button>
-            </form>
-        </section>
     </section>
 {% endblock %}
 
 {% block javascript %}
-    <script type="module" src="/js/perfil.js?v=20261121-2"></script>
     <script type="module" src="/js/resenas.js"></script>
 {% endblock %}

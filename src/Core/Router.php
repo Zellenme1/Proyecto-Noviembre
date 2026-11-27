@@ -41,7 +41,6 @@ class Router
 
         ['POST', '/api/foto',     PerfilApiController::class, 'subirFoto'],
         ['POST', '/api/curriculum', PerfilApiController::class, 'subirCurriculum'],
-        ['DELETE', '/api/perfil', PerfilApiController::class, 'eliminarCuenta'],
 
         // ---- API pública: filtro y buscador
         ['GET', '/api/categorias', CategoriaApiController::class, 'index'],

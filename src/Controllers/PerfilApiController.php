@@ -157,22 +157,4 @@ class PerfilApiController extends ApiController
         };
     }
 
-    public function eliminarCuenta(): void
-    {
-        $usuario = Auth::requireLogin();
-        $in = $this->readJsonBody();
-        $password = is_string($in['password'] ?? null) ? $in['password'] : '';
-
-        if ($password === '' || !password_verify($password, $usuario->getPasswordHash())) {
-            $this->jsonResponse(['error' => 'La contraseña no es correcta'], 422);
-        }
-
-        $id = (int)$usuario->getId();
-        if (!$this->usuarioDAO->desactivar($id)) {
-            $this->jsonResponse(['error' => 'No se pudo eliminar la cuenta'], 409);
-        }
-
-        Auth::logout();
-        $this->jsonResponse(['message' => 'Cuenta eliminada']);
-    }
 }
