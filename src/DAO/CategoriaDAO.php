@@ -18,6 +18,7 @@ class CategoriaDAO
     /** @return Categoria[] */
     public function getAll(): array
     {
+        // Consulta todas las categorías y las convierte en objetos.
         $stmt = $this->db->query(
             'SELECT id_categoria, nombre, descripcion FROM categorias ORDER BY nombre'
         );

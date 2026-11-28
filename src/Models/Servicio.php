@@ -29,6 +29,7 @@ class Servicio implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
+        // Indica qué datos del servicio se envían a JavaScript.
         return [
             'id_servicio' => $this->id,
             'id_categoria' => $this->idCategoria,

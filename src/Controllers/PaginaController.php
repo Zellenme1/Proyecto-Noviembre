@@ -116,6 +116,7 @@ class PaginaController
     /** El catálogo agrupado por categoría, para elegir servicios al registrarse. */
     private function serviciosPorCategoria(): array
     {
+        // Junta cada servicio dentro de su categoría para el registro.
         $grupos = [];
         foreach ((new CategoriaDAO())->getAll() as $categoria) {
             $grupos[$categoria->getId()] = ['categoria' => $categoria, 'servicios' => []];

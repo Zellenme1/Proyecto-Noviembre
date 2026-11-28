@@ -41,6 +41,7 @@ class Usuario implements \JsonSerializable
     /** Nunca incluye el hash de la contraseña. */
     public function jsonSerialize(): array
     {
+        // Evita enviar la contraseña y devuelve solo datos seguros del usuario.
         return [
             'id_usuario' => $this->id,
             'nombre' => $this->nombre,

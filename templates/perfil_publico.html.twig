@@ -3,12 +3,17 @@
 {% block title %}{{ titulo_pagina }}{% endblock %}
 
 {% block content %}
-    <section class="container">
-        <h2>{{ profesional.nombre }} {{ profesional.apellidos }}</h2>
-
-        {% if profesional.foto %}
-            <img class="avatar" src="{{ profesional.foto }}" alt="Foto de {{ profesional.nombre }}">
-        {% endif %}
+    <section class="container perfil-pagina perfil-publico">
+        {# Se muestran el nombre y la foto del profesional elegido. #}
+        <header class="perfil-cabecera">
+            {% if profesional.foto %}
+                <img class="avatar perfil-avatar" src="{{ profesional.foto }}" alt="Foto de {{ profesional.nombre }}">
+            {% endif %}
+            <div>
+                <p class="perfil-presentacion">Perfil profesional</p>
+                <h2>{{ profesional.nombre }} {{ profesional.apellidos }}</h2>
+            </div>
+        </header>
 
         <section id="resenas" data-profesional="{{ profesional.id }}" aria-labelledby="titulo-resenas">
             <h3 id="titulo-resenas">Reseñas</h3>

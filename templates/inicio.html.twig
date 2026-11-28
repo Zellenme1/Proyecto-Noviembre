@@ -3,6 +3,7 @@
 {% block title %}{{ titulo_pagina }}{% endblock %}
 
 {% block content %}
+    {# El contenido cambia según si el visitante entró como administrador o usuario. #}
     {% if usuario %}
         <section class="container">
             <h2>Hola, {{ usuario.nombre }}</h2>

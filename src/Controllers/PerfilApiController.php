@@ -30,6 +30,7 @@ class PerfilApiController extends ApiController
 
     public function subirFoto(): void
     {
+        // Comprueba que la foto sea válida y la guarda en el servidor.
         $usuario = Auth::requireLogin();
 
         $archivo = $_FILES['foto'] ?? null;
@@ -79,6 +80,7 @@ class PerfilApiController extends ApiController
     /** POST /api/curriculum: guarda PDF, DOC o DOCX del usuario con sesión iniciada. */
     public function subirCurriculum(): void
     {
+        // Comprueba el currículum y lo guarda junto al perfil.
         $usuario = Auth::requireLogin();
 
         $archivo = $_FILES['curriculum'] ?? null;

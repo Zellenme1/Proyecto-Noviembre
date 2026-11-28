@@ -74,3 +74,4 @@ CREATE TABLE valoraciones (
     fecha_valoracion DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_solicitud) REFERENCES solicitudes_trueque(id_solicitud) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Primero se crean las tablas principales y sus relaciones.

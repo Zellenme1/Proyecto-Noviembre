@@ -86,3 +86,4 @@ INSERT INTO valoraciones (id_valoracion, id_solicitud, puntuacion, comentario) V
 -- Profesional (Javier)	javier@trueques.local	Trueque1234!
 -- Profesional (Lucia)	lucia@trueques.local	Trueque1234!
 -- Profesional (Pablo)	pablo@trueques.local	Trueque1234!
+-- Aquí se añaden datos de prueba después de crear las tablas.

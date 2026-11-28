@@ -17,6 +17,7 @@ class  ValoracionDAO
     /** Media y número de reseñas de un profesional (todas sus ofertas juntas). */
     public function resumenDeProfesional(int $idProfesional): array
     {
+        // Cuenta cuántas notas hay y calcula la media.
         $stmt = $this->db->prepare(
             'SELECT AVG(v.puntuacion) AS media, COUNT(*) AS total
              FROM valoraciones v

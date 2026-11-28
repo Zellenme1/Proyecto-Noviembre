@@ -26,6 +26,7 @@ class ServicioApiController extends ApiController
 
     public function index(): void
     {
+        // Devuelve el catálogo completo.
         Auth::requireLogin();
         $this->jsonResponse($this->servicioDAO->getAll());
     }
@@ -42,6 +43,7 @@ class ServicioApiController extends ApiController
 
     public function store(): void
     {
+        // Recibe los datos y crea un servicio nuevo.
         Auth::requireRole(Usuario::ROL_ADMIN);
         ['errores' => $errores, 'datos' => $d] = $this->validar($this->readJsonBody());
         if ($errores) {
@@ -56,6 +58,7 @@ class ServicioApiController extends ApiController
 
     public function update(int $id): void
     {
+        // Cambia los datos del servicio indicado.
         Auth::requireRole(Usuario::ROL_ADMIN);
         if ($this->servicioDAO->getById($id) === null) {
             $this->jsonResponse(['error' => 'Servicio no encontrado'], 404);
@@ -74,6 +77,7 @@ class ServicioApiController extends ApiController
 
     public function destroy(int $id): void
     {
+        // Comprueba si se puede borrar y elimina el servicio.
         Auth::requireRole(Usuario::ROL_ADMIN);
         if ($this->servicioDAO->getById($id) === null) {
             $this->jsonResponse(['error' => 'Servicio no encontrado'], 404);

@@ -77,6 +77,7 @@ class Database
 
     public function getConnection(): PDO
     {
+        // Devuelve la conexión; si no existe, la crea una vez.
         return $this->connection;
     }
 

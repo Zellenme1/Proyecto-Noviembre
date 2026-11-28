@@ -9,6 +9,7 @@ const listaEnviadas = document.getElementById('lista-enviadas');
 const mensaje = document.getElementById('mensaje');
 
 function mostrarMensaje(texto, tipo = 'ok') {
+    // Enseña el aviso y le indica al CSS si es correcto o incorrecto.
     mensaje.textContent = texto;
     mensaje.dataset.tipo = tipo;
     mensaje.hidden = false;
@@ -20,6 +21,7 @@ function mostrarMensaje(texto, tipo = 'ok') {
 
 /** Botones según quién soy en la solicitud y en qué estado está. */
 function accionesDe(s, tipo) {
+    // Cambia los botones según si la solicitud fue recibida o enviada.
     if (tipo === 'recibidas' && s.estado === 'SOLICITADO') {
         return `
             <button type="button" data-accion="aceptar" data-id="${s.id_solicitud}">Aceptar</button>
@@ -35,6 +37,7 @@ function accionesDe(s, tipo) {
 }
 
 function formularioCancelacion(id) {
+    // Sustituye el botón cancelar por un motivo obligatorio.
     return `
         <form class="form-cancelacion" data-id="${id}">
             <label for="motivo-cancelacion-${id}">Motivo de cancelación</label>
@@ -47,6 +50,7 @@ function formularioCancelacion(id) {
 }
 
 function bloqueResena(s, tipo) {
+    // Solo permite valorar solicitudes completadas que fueron enviadas.
     if (tipo !== 'enviadas' || s.estado !== 'COMPLETADO') return '';
 
     const existe = s.id_valoracion !== null;
@@ -81,6 +85,7 @@ function bloqueResena(s, tipo) {
 }
 
 function tarjeta(s, tipo) {
+    // Junta los datos de una solicitud en su ficha visual.
     const quien = tipo === 'recibidas' ? 'Cliente' : 'Profesional';
     const acciones = accionesDe(s, tipo);
     const horas = String(s.horas_estimadas).replace('.', ',');
@@ -117,6 +122,7 @@ function pintar(contenedor, solicitudes, tipo, vacio) {
 }
 
 async function cargar() {
+    // Pide las dos listas y las vuelve a pintar al terminar una acción.
     try {
         const datos = await fetchJSON('/api/solicitudes');
         pintar(listaRecibidas, datos.recibidas, 'recibidas', 'Todavía no has recibido ninguna solicitud.');
@@ -140,6 +146,7 @@ const TEXTO_OK = {
 };
 
 async function onClick(e) {
+    // Detecta qué botón se pulsó y hace la acción correspondiente.
     const botonVolver = e.target.closest('button[data-cancelacion-cerrar]');
     if (botonVolver) {
         const { id } = botonVolver.dataset;
@@ -182,6 +189,7 @@ async function onClick(e) {
 }
 
 async function onCancelSubmit(e) {
+    // Comprueba el motivo y envía la cancelación.
     const formulario = e.target.closest('form.form-cancelacion');
     if (!formulario) return;
     e.preventDefault();
@@ -211,6 +219,7 @@ async function onCancelSubmit(e) {
 }
 
 function onReviewClick(e) {
+    // Abre o cierra el formulario de la reseña.
     const boton = e.target.closest('button[data-resena-accion]');
     if (!boton) return;
 
@@ -229,6 +238,7 @@ function onReviewClick(e) {
 }
 
 async function onReviewSubmit(e) {
+    // Envía una reseña nueva o actualiza una existente.
     const formulario = e.target.closest('form.form-resena');
     if (!formulario) return;
     e.preventDefault();

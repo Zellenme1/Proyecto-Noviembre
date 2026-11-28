@@ -14,3 +14,4 @@ SET @migracion = IF(
 PREPARE migracion_cancelacion FROM @migracion;
 EXECUTE migracion_cancelacion;
 DEALLOCATE PREPARE migracion_cancelacion;
+-- Permite guardar qué escribió el usuario al cancelar.

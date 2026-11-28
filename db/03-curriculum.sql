@@ -14,3 +14,4 @@ SET @migracion = IF(
 PREPARE migracion_curriculum FROM @migracion;
 EXECUTE migracion_curriculum;
 DEALLOCATE PREPARE migracion_curriculum;
+-- Actualiza la tabla de usuarios para guardar la ruta del currículum.

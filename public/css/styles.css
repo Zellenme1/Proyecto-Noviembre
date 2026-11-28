@@ -1,4 +1,4 @@
-/* COLORES */
+/* Colores y medidas que se repiten en toda la página. */
 :root {
     color-scheme: light;
 
@@ -25,9 +25,11 @@
 
     --radius: 0.4rem;
     --width: 70rem;
+    --shadow: 0 0.35rem 1rem darkslategray;
+    --shadow-hover: 0 0.6rem 1.25rem darkslategray;
 }
 
-/* BASE */
+/* Estilos generales: fondo, tamaños y enlaces. */
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 
@@ -38,7 +40,9 @@ body {
     flex-direction: column;
     background: var(--bg);
     color: var(--ink);
-    font: 1rem/1.6 system-ui, sans-serif;
+    font: 400 1rem/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    text-rendering: optimizeLegibility;
+    font-synthesis: none;
 }
 
 main {
@@ -56,19 +60,21 @@ main {
 }
 .pie-pagina p { max-width: none; margin-inline: auto; font-size: 0.9rem; }
 
-h1, h2, h3, h4 { margin: 0; line-height: 1.2; }
-h2 { font-size: 1.75rem; }
-h3 { font-size: 1.2rem; }
-h4 { font-size: 1.1rem; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.15; text-wrap: balance; }
+h2 { font-size: clamp(1.55rem, 3vw, 1.9rem); letter-spacing: -0.02em; }
+h3 { font-size: clamp(1.1rem, 2vw, 1.25rem); }
+h4 { font-size: clamp(1rem, 1.5vw, 1.12rem); }
 
 p { margin: 0; max-width: 65ch; }
-a { color: var(--primary); }
+a { color: var(--primary); text-decoration-thickness: 0.08em; text-underline-offset: 0.16em; }
+a:hover { color: var(--primary-hover); }
+a:active { opacity: 0.75; }
 
 .container { display: grid; gap: 1rem; align-content: start; }
 
 :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 
-/* CABECERA Y MENÚ */
+/* Cabecera fija y navegación adaptable al móvil. */
 body > header {
     position: sticky;
     top: 0;
@@ -123,14 +129,11 @@ body > header nav.principal a {
     font-weight: 600;
     text-decoration: none;
 }
-body > header nav.principal a:hover { background: var(--primary-hover); }
-body > header nav.principal a.enlace-destacado { background: var(--accent); color: var(--on-accent); }
-body > header nav.principal a.enlace-destacado:hover { background: var(--accent-hover); }
-body > header nav.principal a[aria-current="page"],
-body > header nav.principal a[aria-current="page"]:hover {
-    background: var(--accent);
-    color: var(--on-accent);
-    box-shadow: inset 0 0 0 2px var(--primary);
+body > header nav.principal a:hover { background: var(--primary-hover); color: var(--on-primary); }
+body > header nav.principal a[aria-current="page"] {
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 0.35rem;
 }
 
 @media (max-width: 48rem) {
@@ -194,7 +197,7 @@ body > header nav.principal a[aria-current="page"]:hover {
     font-weight: 700;
 }
 
-/* FORMULARIOS Y BOTONES */
+/* Campos de texto, formularios y acciones principales. */
 form {
     display: grid;
     gap: 1rem;
@@ -232,6 +235,7 @@ input, textarea, select {
     border-radius: var(--radius);
     font: inherit;
 }
+input:hover, textarea:hover, select:hover { border-color: var(--primary); }
 textarea { min-height: 5.5rem; resize: vertical; }
 input:focus-visible, textarea:focus-visible, select:focus-visible { border-color: var(--primary); }
 
@@ -246,7 +250,8 @@ button {
     font-weight: 600;
     cursor: pointer;
 }
-button:hover { background: var(--surface-2); }
+button:hover { background: var(--surface-2); color: var(--ink); }
+button:active { transform: translateY(1px); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 button[type="submit"] {
@@ -254,13 +259,13 @@ button[type="submit"] {
     border-color: var(--primary);
     color: var(--on-primary);
 }
-button[type="submit"]:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+button[type="submit"]:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: var(--on-primary); }
 
 body > header button { background: var(--transparent); color: var(--on-primary); border-color: var(--on-primary); min-height: 2.25rem; padding-block: 0.3rem; }
-body > header button:hover { background: var(--primary-hover); }
+body > header button:hover { background: var(--primary-hover); color: var(--on-primary); }
 
 .btn-eliminar { color: var(--err-ink); border-color: var(--err-line); }
-.btn-eliminar:hover { background: var(--err-bg); }
+.btn-eliminar:hover { background: var(--err-bg); color: var(--err-ink); }
 .form-cancelacion button[type="submit"] {
     background: var(--err-bg);
     color: var(--err-ink);
@@ -280,11 +285,12 @@ body > header button:hover { background: var(--primary-hover); }
     font-weight: 600;
     text-decoration: none;
 }
-.enlace-boton:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.enlace-boton:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: var(--on-primary); }
+.enlace-boton:active { transform: translateY(1px); }
 .enlace-boton.secundario { background: var(--surface); color: var(--ink); border-color: var(--line); }
-.enlace-boton.secundario:hover { background: var(--surface-2); }
+.enlace-boton.secundario:hover { background: var(--surface-2); color: var(--ink); }
 
-/* MENSAJES Y ESTADOS VACÍOS */
+/* Avisos correctos, errores y mensajes sin datos. */
 #mensaje, #dialogo-mensaje {
     max-width: none;
     padding: 0.8rem 1rem;
@@ -311,7 +317,7 @@ body > header button:hover { background: var(--primary-hover); }
     border-color: var(--err-line);
 }
 
-/* CATÁLOGO: tiques con talón */
+/* Fichas del catálogo: cada ficha incluye datos y puntos. */
 .catalogo { gap: 1.5rem; }
 .catalogo > h2, .catalogo > #mensaje { grid-column: 1 / -1; }
 .catalogo-lista { display: grid; gap: 1rem; align-content: start; min-width: 0; }
@@ -330,7 +336,15 @@ body > header button:hover { background: var(--primary-hover); }
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: box-shadow 180ms ease, transform 180ms ease;
 }
+.ticket:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+.lista-servicios > .ticket:nth-child(even) { background: var(--surface-2); }
+.lista-servicios > .ticket:nth-child(even) .ticket-talon { background: var(--accent-hover); }
 .ticket-cuerpo { display: grid; gap: 0.35rem; align-content: start; padding: 1rem 1.25rem; }
 .ticket-categoria { color: var(--primary); font-size: 0.9rem; font-weight: 600; }
 .ticket-desc { color: var(--ink-soft); }
@@ -339,7 +353,7 @@ body > header button:hover { background: var(--primary-hover); }
 .acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
 .acciones button { min-height: 2.25rem; padding: 0.3rem 0.85rem; font-size: 0.9rem; }
 
-/* Talón: tarifa en puntos por hora */
+/* Parte amarilla que muestra los puntos por hora. */
 .ticket-talon {
     position: relative;
     display: grid;
@@ -355,7 +369,7 @@ body > header button:hover { background: var(--primary-hover); }
 .ticket-talon strong { font-size: 1.9rem; line-height: 1; }
 .ticket-talon span { font-size: 0.8rem; font-weight: 600; }
 
-/* Muescas de la perforación */
+/* Círculos que parecen perforaciones del talón. */
 .ticket-talon::before, .ticket-talon::after {
     content: "";
     position: absolute;
@@ -373,10 +387,31 @@ body > header button:hover { background: var(--primary-hover); }
     .catalogo > form { position: sticky; top: 5rem; }
 }
 
-/* LOGIN E INICIO */
+/* Diseño de inicio de sesión, inicio y registro. */
 .pagina-login main { display: grid; justify-items: center; align-content: start; padding-top: 3.5rem; }
 .pagina-login .container { width: min(100%, 26rem); }
 .pagina-login h2 { text-align: center; }
+
+.pagina-registro .container { width: min(100%, 52rem); }
+.pagina-registro #form-registro {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+.pagina-registro #form-registro > .registro-info,
+.pagina-registro #form-registro > .registro-sin-servicios,
+.pagina-registro #form-registro > button {
+    grid-column: 1 / -1;
+}
+.pagina-registro #form-registro > button { justify-self: stretch; }
+
+@media (max-width: 40rem) {
+    .pagina-registro #form-registro {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pagina-registro #form-registro > * {
+        grid-column: 1;
+    }
+}
 
 .hero { display: grid; gap: 1rem; padding-block: 2rem 2.5rem; }
 .hero h2 { font-size: clamp(1.9rem, 4vw, 2.7rem); }
@@ -400,7 +435,7 @@ body > header button:hover { background: var(--primary-hover); }
 .ayuda, .nota { color: var(--ink-soft); }
 .nota { font-size: 0.9rem; }
 
-/* BUSCADOR, SOLICITUDES Y VENTANA */
+/* Buscador, solicitudes y ventana emergente. */
 .filtros { grid-template-columns: 1fr; align-items: end; }
 @media (min-width: 40rem) {
     .filtros { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto; }
@@ -449,7 +484,7 @@ dialog form { border: 0; }
     border-color: var(--err-line);
 }
 
-/* REGISTRO Y PERFIL */
+/* Casillas de servicios y datos del perfil. */
 .etiqueta { margin: 0; font-weight: 600; }
 
 .grupo-servicios { display: grid; gap: 0.15rem; margin: 0; padding: 0.5rem 0.75rem; border: 1px solid var(--line); border-radius: var(--radius); }
@@ -472,14 +507,92 @@ dialog form { border: 0; }
 .datos-perfil dt { font-weight: 600; }
 .datos-perfil dd { margin: 0; }
 
-/* RESEÑAS */
+.perfil-pagina { gap: 1.25rem; }
+.perfil-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 0.3rem solid var(--accent);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+.perfil-cabecera > div { display: grid; gap: 0.45rem; }
+.perfil-avatar {
+    width: 7rem;
+    height: 7rem;
+    border-width: 4px;
+}
+.perfil-presentacion {
+    color: var(--primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.perfil-datos {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+.perfil-datos .datos-perfil {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+.datos-perfil > div {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.75rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+.datos-perfil > div dd { overflow-wrap: anywhere; }
+.datos-perfil > .dato-curriculum { grid-column: 1 / -1; }
+
+#resenas {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+}
+.perfil-publico #resenas,
+.perfil-pagina #resenas {
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+/* Nota media y lista de reseñas. */
 .media-total { margin: 0; font-size: 1.1rem; }
 .estrellas { color: var(--stars); letter-spacing: 0.1em; }
-.lista-resenas li { padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.lista-resenas li {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-left: 0.3rem solid var(--accent);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
 .lista-resenas p { margin: 0; }
 .solo-lectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 
-/* MÓVIL */
+@media (max-width: 40rem) {
+    .perfil-cabecera { align-items: flex-start; }
+    .perfil-avatar { width: 5rem; height: 5rem; }
+    .perfil-datos .datos-perfil { grid-template-columns: minmax(0, 1fr); }
+    .datos-perfil > .dato-curriculum { grid-column: 1; }
+}
+
+/* Ajustes pequeños para pantallas estrechas. */
 @media (max-width: 30rem) {
     h2 { font-size: 1.5rem; }
     .ticket-talon { min-width: 5rem; padding-inline: 0.6rem; }

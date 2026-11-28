@@ -20,6 +20,7 @@ class UsuarioDAO
 
     public function getById(int $id): ?Usuario
     {
+        // Busca un usuario por su número de identificación.
         $stmt = $this->db->prepare('SELECT ' . self::COLUMNAS . ' FROM usuarios WHERE id_usuario = :id');
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch();
@@ -44,6 +45,7 @@ class UsuarioDAO
     /** Devuelve el id del usuario creado. */
     public function create(Usuario $usuario): int
     {
+        // Inserta el usuario con su contraseña ya cifrada.
         $stmt = $this->db->prepare(
             'INSERT INTO usuarios (nombre, apellidos, email, password, telefono, rol, puntos_saldo)
              VALUES (:nombre, :apellidos, :email, :password, :telefono, :rol, :puntos)'

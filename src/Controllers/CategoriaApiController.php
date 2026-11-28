@@ -20,6 +20,7 @@ class CategoriaApiController extends ApiController
 
     public function index(): void
     {
+        // Se obtienen todas las categorías y se devuelven como JSON.
         $this->jsonResponse($this->categoriaDAO->getAll());
     }
 }

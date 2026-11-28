@@ -14,6 +14,7 @@ use PDO;
  */
 class SolicitudDAO
 {
+    // Esta consulta base se comparte por las solicitudes enviadas y recibidas.
     private const SELECT_LISTA = 'SELECT st.id_solicitud, st.horas_estimadas, st.puntos_totales,
                                          st.fecha_propuesta, st.fecha_completado, st.estado,
                                          st.motivo_cancelacion,
@@ -119,6 +120,7 @@ class SolicitudDAO
      */
     public function create(int $idCliente, int $idOferta, float $horas, int $puntos, string $fechaPropuesta): array
     {
+        // Todo el cálculo y el insert se hacen dentro de una transacción.
         $this->db->beginTransaction();
         try {
             $stmt = $this->db->prepare(
@@ -203,6 +205,7 @@ class SolicitudDAO
      */
     public function completar(int $id, int $idProfesional): array
     {
+        // Comprueba primero ambos usuarios y después mueve los puntos.
         $this->db->beginTransaction();
         try {
             $stmt = $this->db->prepare(

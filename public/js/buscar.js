@@ -37,6 +37,7 @@ let ofertas = [];
 // -----------------------------------------------------------------------------
 
 async function cargarCategorias() {
+    // Añade al desplegable las categorías recibidas del servidor.
     const categorias = await fetchJSON('/api/categorias');
     selectCategoria.insertAdjacentHTML(
         'beforeend',
@@ -45,6 +46,7 @@ async function cargarCategorias() {
 }
 
 async function buscar() {
+    // Construye los filtros y pide al servidor las ofertas que coincidan.
     lista.innerHTML = '<p>Buscando…</p>';
 
     const params = new URLSearchParams();
@@ -62,6 +64,7 @@ async function buscar() {
 }
 
 function accionDe(oferta) {
+    // Decide si muestra solicitar, iniciar sesión o un aviso.
     if (idUsuario === null) {
         return '<a class="enlace-boton" href="/login">Inicia sesión para solicitar</a>';
     }
@@ -75,6 +78,7 @@ function accionDe(oferta) {
 }
 
 function renderizar() {
+    // Si no hay ofertas muestra un mensaje; si existen, crea las fichas.
     if (ofertas.length === 0) {
         lista.innerHTML = '<p>No hay servicios que coincidan con tu búsqueda.</p>';
         return;
@@ -124,6 +128,7 @@ function ofertaElegida() {
 
 /** Mismo cálculo que el servidor: puntos/hora x horas, redondeado hacia arriba. */
 function actualizarTotal() {
+    // Recalcula los puntos según las horas elegidas.
     const oferta = ofertaElegida();
     const horas = obtenerDuracionHoras();
     const total = oferta && horas !== null
@@ -140,6 +145,7 @@ function obtenerDuracionHoras() {
 }
 
 async function abrirDialogo(idOferta) {
+    // Copia los datos de la oferta elegida en la ventana de solicitud.
     const oferta = ofertas.find((o) => o.id_oferta === idOferta);
     if (!oferta || !dialogo) return;
 
@@ -174,6 +180,7 @@ if (dialogo) {
     btnCerrar.addEventListener('click', () => dialogo.close());
 
     formSolicitud.addEventListener('submit', async (e) => {
+        // Valida la duración antes de enviar la solicitud.
         e.preventDefault();
         mensajeDialogo.hidden = true;
         btnEnviar.disabled = true;

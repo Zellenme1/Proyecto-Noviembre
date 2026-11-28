@@ -13,6 +13,7 @@ class ServicioWebController extends WebController
 {
     public function spa(): void
     {
+        // Abre la página SPA de administración del catálogo.
         $usuario = Auth::user();
         if ($usuario === null) {
             $this->redirect('/login');

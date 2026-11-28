@@ -10,6 +10,7 @@ final class Session
 {
     public static function start(): void
     {
+        // Inicia la sesión una sola vez.
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }

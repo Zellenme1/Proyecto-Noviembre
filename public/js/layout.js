@@ -13,20 +13,24 @@ const menuPanel = document.getElementById('panel-menu');
 
 if (menuBoton && menuPanel) {
     const establecerMenuAbierto = (abierto) => {
+        // Actualiza ambos atributos para abrir o cerrar el menú móvil.
         menuPanel.dataset.abierto = String(abierto);
         menuBoton.setAttribute('aria-expanded', String(abierto));
         menuBoton.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
     };
 
     menuBoton.addEventListener('click', () => {
+        // Cambia el menú cuando se pulsa el botón.
         establecerMenuAbierto(menuBoton.getAttribute('aria-expanded') !== 'true');
     });
 
     menuPanel.addEventListener('click', (e) => {
+        // Cierra el menú después de elegir una página.
         if (e.target.closest('a')) establecerMenuAbierto(false);
     });
 
     document.addEventListener('keydown', (e) => {
+        // Permite cerrar el menú con Escape.
         if (e.key === 'Escape' && menuBoton.getAttribute('aria-expanded') === 'true') {
             establecerMenuAbierto(false);
             menuBoton.focus();

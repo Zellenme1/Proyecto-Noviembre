@@ -27,6 +27,7 @@ class ServicioDAO
     /** @return Servicio[] */
     public function getAll(): array
     {
+        // Consulta todos los servicios y su categoría.
         $stmt = $this->db->query(self::SELECT . ' ORDER BY c.nombre, s.nombre');
         return array_map(fn(array $row) => $this->mapToObject($row), $stmt->fetchAll());
     }

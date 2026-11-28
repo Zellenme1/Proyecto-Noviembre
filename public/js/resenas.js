@@ -6,10 +6,12 @@ const lista = document.getElementById('lista-resenas');
 
 // 4 -> "★★★★☆"
 function estrellas(n) {
+    // Repite estrellas llenas y vacías según la puntuación.
     return '★'.repeat(n) + '☆'.repeat(5 - n);
 }
 
 function pintarResumen(datos) {
+    // Valida la respuesta y muestra la nota media.
     if (datos === null) {
         resumen.innerHTML = '';
         return;
@@ -43,6 +45,7 @@ function pintarResumen(datos) {
 }
 
 function pintarLista(resenas) {
+    // Crea una fila por cada reseña recibida.
     if (resenas === null || (Array.isArray(resenas) && resenas.length === 0)) {
         lista.innerHTML = '<p>No hay reseñas.</p>';
         return;
@@ -63,6 +66,7 @@ function pintarLista(resenas) {
 }
 
 async function cargar() {
+    // Pide el resumen y las reseñas del profesional.
     try {
         const datos = await fetchJSON(`/api/profesionales/${seccion.dataset.profesional}/resenas`);
         if (!datos || typeof datos !== 'object') {

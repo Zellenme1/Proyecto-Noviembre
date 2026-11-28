@@ -2,7 +2,7 @@
 
 {% block title %}{{ titulo_pagina }}{% endblock %}
 
-{% block body_class %}pagina-login{% endblock %}
+{% block body_class %}pagina-login pagina-registro{% endblock %}
 
 {% block content %}
     <section class="container">
@@ -11,6 +11,7 @@
         <p id="mensaje" role="alert" hidden></p>
 
         <form id="form-registro" novalidate>
+            {# Los datos básicos se colocan primero. #}
             <div>
                 <label for="nombre">Nombre</label>
                 <input type="text" id="nombre" name="nombre" maxlength="100" autocomplete="given-name" required>
@@ -37,11 +38,12 @@
             </div>
 
             {# Servicios que ofrece desde el primer día: una casilla por servicio, agrupados por categoría #}
-            <div>
+            <div class="registro-info">
                 <p class="etiqueta">Servicios que ofreces <span class="ayuda">(opcional)</span></p>
                 <p class="ayuda">Marca los que sabes hacer. Los ofrecerás desde el primer día con la tarifa de referencia.</p>
             </div>
             {% for grupo in grupos %}
+                {# Se agrupan las casillas por categoría para facilitar la elección. #}
                 <fieldset class="grupo-servicios">
                     <legend>{{ grupo.categoria.nombre }}</legend>
                     {% for servicio in grupo.servicios %}
@@ -53,16 +55,16 @@
                     {% endfor %}
                 </fieldset>
             {% else %}
-                <p class="ayuda">Todavía no hay servicios en el catálogo. Podrás añadirlos más adelante.</p>
+                <p class="ayuda registro-sin-servicios">Todavía no hay servicios en el catálogo. Podrás añadirlos más adelante.</p>
             {% endfor %}
 
-            <div>
+            <div class="registro-foto">
                 <label for="foto">Foto de perfil (opcional)</label>
                 <input type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/webp">
                 <p class="ayuda">JPG, PNG o WEBP, hasta 2 MB.</p>
             </div>
 
-            <div>
+            <div class="registro-curriculum">
                 <label for="curriculum">Currículum (opcional)</label>
                 <input type="file" id="curriculum" name="curriculum" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
                 <p class="ayuda">PDF, DOC o DOCX, hasta 5 MB.</p>

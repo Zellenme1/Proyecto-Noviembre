@@ -21,6 +21,7 @@ class Categoria implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
+        // Indica qué datos se muestran al convertir la categoría a JSON.
         return [
             'id_categoria' => $this->id,
             'nombre' => $this->nombre,

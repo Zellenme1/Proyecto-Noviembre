@@ -12,6 +12,7 @@
         <p id="mensaje" role="status" aria-live="polite" hidden></p>
 
         <form id="form-filtros" class="filtros" role="search" novalidate>
+            {# Los dos filtros permiten limitar las ofertas mostradas. #}
             <div>
                 <label for="q">¿Qué necesitas?</label>
                 <input type="search" id="q" name="q" maxlength="100" placeholder="Fontanería, ordenadores…">
@@ -29,6 +30,7 @@
     </section>
 
     {% if usuario and usuario.rol == 'PROFESIONAL' %}
+        {# Esta ventana solo aparece para profesionales que pueden solicitar servicios. #}
         <dialog id="dialogo-solicitud" aria-labelledby="dialogo-titulo">
             <form id="form-solicitud" novalidate>
                 <h3 id="dialogo-titulo">Solicitar servicio</h3>

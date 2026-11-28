@@ -16,17 +16,20 @@ const mensaje = document.getElementById('mensaje');
 const boton = document.getElementById('btn-registrar');
 
 function mostrarError(texto) {
+    // Enseña el error y permite volver a pulsar el botón.
     mensaje.textContent = texto;
     mensaje.hidden = false;
     boton.disabled = false;
 }
 
 form.addEventListener('submit', async (e) => {
+    // Impide el envío normal hasta comprobar los datos localmente.
     e.preventDefault();
     mensaje.hidden = true;
     boton.disabled = true;
 
     const email = document.getElementById('email').value;
+    // Se guardan estos valores para usarlos también al iniciar sesión.
     const password = document.getElementById('password').value;
     const foto = document.getElementById('foto').files[0] ?? null;
     const curriculum = document.getElementById('curriculum').files[0] ?? null;

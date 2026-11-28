@@ -56,6 +56,7 @@ final class Auth
 
     public static function login(Usuario $usuario): void
     {
+        // Guarda el usuario conectado y renueva el token CSRF.
         session_regenerate_id(true);   // id de sesión nuevo: evita la fijación de sesión
         $_SESSION[self::CLAVE_USUARIO] = $usuario->getId();
         self::nuevoTokenCsrf();

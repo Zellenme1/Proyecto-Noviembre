@@ -6,9 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
     <meta name="color-scheme" content="light">
     <title>{% block title %}Banco de Horas y Servicios{% endblock %}</title>
-    <link rel="stylesheet" href="/css/styles.css?v=20261121-7">
+    <link rel="stylesheet" href="/css/styles.css?v=20261128-8">
 </head>
 <body class="{% block body_class %}{% endblock %}">
+    {# Esta cabecera se muestra en todas las páginas. #}
     <header>
         <h1><a href="/">Ego pro te, tu pro me</a></h1>
 
@@ -24,7 +25,7 @@
 
                 {% if usuario is null %}
                     <a href="/login">Iniciar sesión</a>
-                    <a href="/registro" class="enlace-destacado">Registrarse</a>
+                    <a href="/registro">Registrarse</a>
                 {% elseif usuario.rol == 'ADMIN' %}
                     <a href="/servicios-spa">Catálogo</a>
                 {% else %}
@@ -48,6 +49,7 @@
     </header>
 
     <main>
+        {# Cada página añade aquí su propio contenido. #}
         {% block content %}{% endblock %}
     </main>
 

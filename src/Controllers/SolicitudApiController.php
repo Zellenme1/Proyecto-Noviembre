@@ -28,6 +28,7 @@ class SolicitudApiController extends ApiController
 
     public function index(): void
     {
+        // Separa las solicitudes enviadas de las que llegan al usuario.
         $usuario = Auth::requireRole(Usuario::ROL_PROFESIONAL);
         $id = (int)$usuario->getId();
 
@@ -39,6 +40,7 @@ class SolicitudApiController extends ApiController
 
     public function puntosDisponibles(): void
     {
+        // Devuelve el saldo que queda después de reservar solicitudes.
         $usuario = Auth::requireRole(Usuario::ROL_PROFESIONAL);
         $puntos = $this->solicitudDAO->getPuntosDisponibles((int)$usuario->getId());
         if ($puntos === null) {
@@ -50,6 +52,7 @@ class SolicitudApiController extends ApiController
 
     public function store(): void
     {
+        // Valida la oferta y crea la solicitud si hay puntos suficientes.
         $usuario = Auth::requireRole(Usuario::ROL_PROFESIONAL);
         $in = $this->readJsonBody();
 
@@ -119,6 +122,7 @@ class SolicitudApiController extends ApiController
 
     public function update(int $id): void
     {
+        // Ejecuta aceptar, rechazar, cancelar o completar.
         $usuario = Auth::requireRole(Usuario::ROL_PROFESIONAL);
         $in = $this->readJsonBody();
         $accion = is_string($in['accion'] ?? null) ? $in['accion'] : '';

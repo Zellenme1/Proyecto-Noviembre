@@ -67,6 +67,7 @@ class Router
 
     public function dispatch(): void
     {
+        // Busca la ruta que coincide y ejecuta el método indicado.
         $metodo = $_SERVER['REQUEST_METHOD'];
         $url = rtrim((string)parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') ?: '/';
 

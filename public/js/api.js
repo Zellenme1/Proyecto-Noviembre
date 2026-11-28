@@ -4,6 +4,7 @@
 
 /** Token CSRF que el servidor deja en <meta name="csrf-token">. */
 export function csrfToken() {
+    // Lee el token actualizado que protege las peticiones POST, PUT y DELETE.
     return document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 }
 
@@ -14,6 +15,7 @@ export function csrfToken() {
  * - Lanza Error con .status y .details (errores por campo) si la respuesta no es OK.
  */
 export async function fetchJSON(url, options = {}) {
+    // Centraliza las llamadas y convierte la respuesta a un error fácil de leer.
     const method = (options.method ?? 'GET').toUpperCase();
     const headers = { Accept: 'application/json', ...(options.headers ?? {}) };
 
@@ -47,6 +49,7 @@ export async function fetchJSON(url, options = {}) {
 }
 
 export function escapeHTML(valor) {
+    // Cambia caracteres especiales para evitar que datos se interpreten como HTML.
     return String(valor ?? '').replace(/[&<>'"]/g, (c) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
     }[c]));
@@ -61,6 +64,7 @@ export function textoError(error) {
 
 /** Fecha de MySQL ("2026-11-20 09:00:00") en formato legible para el usuario. */
 export function formatearFecha(valor) {
+    // Convierte la fecha guardada en MySQL a un formato español.
     const fecha = new Date(String(valor ?? '').replace(' ', 'T'));
     return Number.isNaN(fecha.getTime())
         ? String(valor ?? '')

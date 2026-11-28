@@ -21,6 +21,7 @@ class ValoracionApiController extends ApiController
 
     public function index(int $idProfesional): void
     {
+        // Devuelve la media y todas las reseñas del profesional.
         $profesional = $this->usuarioDAO->getById($idProfesional);
 
         if ($profesional === null || !$profesional->isActivo() || $profesional->getRol() !== Usuario::ROL_PROFESIONAL) {

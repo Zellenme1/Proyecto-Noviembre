@@ -30,24 +30,30 @@ class AuthApiController extends ApiController
 
     public function login(): void
     {
+        // Se leen los datos enviados desde el formulario de acceso.
         $in = $this->readJsonBody();
         $email = is_string($in['email'] ?? null) ? strtolower(trim($in['email'])) : '';
         $password = is_string($in['password'] ?? null) ? $in['password'] : '';
 
+        // Si falta el email o la contraseña, no se consulta la base de datos.
         if ($email === '' || $password === '') {
             $this->jsonResponse(['error' => 'Introduce tu email y tu contraseña'], 422);
         }
 
+        // Se busca el usuario por su email.
         $usuario = $this->usuarioDAO->getByEmail($email);
+        // Se comprueba la contraseña aunque el usuario no exista para que el acceso tarde parecido.
         $hashValido = password_verify($password, $usuario?->getPasswordHash() ?? self::HASH_RELLENO);
 
-        // Mensaje único para email inexistente, contraseña errónea o cuenta de baja.
+        // Si falla alguno de estos datos, se muestra el mismo mensaje para no indicar qué está mal.
         if ($usuario === null || !$hashValido || !$usuario->isActivo()) {
             $this->jsonResponse(['error' => 'Email o contraseña incorrectos'], 401);
         }
 
+        // La contraseña es correcta: se guarda al usuario en la sesión.
         Auth::login($usuario);
 
+        // Se devuelve el usuario, el token CSRF y la página a la que debe entrar.
         $this->jsonResponse([
             'usuario' => $usuario,
             'csrf_token' => Auth::csrfToken(),
@@ -57,17 +63,21 @@ class AuthApiController extends ApiController
 
     public function logout(): void
     {
+        // Se eliminan los datos de sesión del usuario.
         Auth::logout();
         $this->jsonResponse(['message' => 'Sesión cerrada']);
     }
 
     public function registro(): void
     {
+        // El servidor valida los datos antes de intentar crear la cuenta.
         ['errores' => $errores, 'datos' => $d] = $this->validarRegistro($this->readJsonBody());
 
+        // Se hace una comprobación extra por si el email ya fue registrado.
         if (!isset($errores['email']) && $this->usuarioDAO->emailExists($d['email'])) {
             $this->jsonResponse(['error' => 'Ya existe una cuenta con ese email', 'errores' => ['email' => 'Email ya registrado']], 409);
         }
+        // Si hay errores de formato, no se crea ningún usuario.
         if ($errores) {
             $this->jsonResponse(['error' => 'Datos no válidos', 'errores' => $errores], 422);
         }
@@ -86,6 +96,7 @@ class AuthApiController extends ApiController
         );
 
         try {
+            // Se crea el usuario y se enlazan los servicios que haya elegido.
             $id = $this->usuarioDAO->registrar($nuevo, $d['servicios']);
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000' && str_contains($e->getMessage(), 'email')) {

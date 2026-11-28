@@ -14,6 +14,7 @@ final class Csrf
 
     public static function token(): string
     {
+        // Usa el mismo token durante la sesión para comprobar envíos.
         if (empty($_SESSION[self::KEY]) || !is_string($_SESSION[self::KEY])) {
             return self::rotate();
         }

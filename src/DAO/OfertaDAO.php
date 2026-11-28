@@ -36,6 +36,7 @@ class OfertaDAO
      */
     public function buscar(?int $idCategoria, string $texto): array
     {
+        // Añade los filtros solo si el usuario los escribió.
         $sql = self::SELECT;
         $params = [];
 

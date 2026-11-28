@@ -20,6 +20,7 @@ let servicios = [];
 // -----------------------------------------------------------------------------
 
 function mostrarMensaje(texto, tipo = 'ok') {
+    // Cambia el texto y el tipo visual del aviso.
     mensaje.textContent = texto;
     mensaje.dataset.tipo = tipo; // 'ok' | 'error' (para estilizar con CSS)
     mensaje.hidden = false;
@@ -30,6 +31,7 @@ function mostrarMensaje(texto, tipo = 'ok') {
 // -----------------------------------------------------------------------------
 
 async function cargarCategorias() {
+    // Llena la lista de categorías del formulario.
     const categorias = await fetchJSON('/api/categorias');
     selectCategoria.innerHTML =
         '<option value="">Selecciona una categoría</option>' +
@@ -39,6 +41,7 @@ async function cargarCategorias() {
 }
 
 async function cargarServicios() {
+    // Muestra "cargando" y pide la lista al servidor.
     lista.innerHTML = '<p>Cargando servicios…</p>';
     try {
         servicios = await fetchJSON('/api/servicios');
@@ -49,6 +52,7 @@ async function cargarServicios() {
 }
 
 function renderizarLista() {
+    // Convierte cada servicio recibido en una ficha HTML.
     if (servicios.length === 0) {
         lista.innerHTML = '<p>Todavía no hay servicios en el catálogo. Crea el primero con el formulario.</p>';
         return;
@@ -77,6 +81,7 @@ function renderizarLista() {
 // -----------------------------------------------------------------------------
 
 function resetFormulario() {
+    // Deja el formulario listo para crear otro servicio.
     form.reset();
     campoId.value = '';
     tituloForm.textContent = 'Nuevo servicio';
@@ -85,6 +90,7 @@ function resetFormulario() {
 }
 
 function editarServicio(id) {
+    // Copia los datos del servicio seleccionado dentro del formulario.
     const s = servicios.find((x) => x.id_servicio === id);
     if (!s) return;
 
@@ -102,6 +108,7 @@ function editarServicio(id) {
 }
 
 form.addEventListener('submit', async (e) => {
+    // Si hay id se modifica; si no existe, se crea.
     e.preventDefault();
 
     const id = campoId.value;
@@ -132,6 +139,7 @@ btnCancelar.addEventListener('click', resetFormulario);
 // -----------------------------------------------------------------------------
 
 lista.addEventListener('click', async (e) => {
+    // Comprueba qué botón pulsó el usuario dentro de la lista.
     const boton = e.target.closest('button[data-id]');
     if (!boton) return;
 

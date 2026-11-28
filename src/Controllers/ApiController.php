@@ -8,6 +8,7 @@ namespace App\Controllers;
  */
 abstract class ApiController
 {
+    // Convierte los datos a JSON y fija el código HTTP de respuesta.
     protected function jsonResponse(mixed $data, int $statusCode = 200): never
     {
         header('Content-Type: application/json; charset=UTF-8');

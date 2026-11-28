@@ -14,6 +14,7 @@ use Twig\Loader\FilesystemLoader;
  */
 abstract class WebController
 {
+    // Guarda el entorno Twig que se usa para pintar las páginas.
     protected Environment $twig;
 
     public function __construct()

@@ -21,6 +21,7 @@ class OfertaApiController extends ApiController
 
     public function index(): void
     {
+        // Lee los filtros y devuelve solo las ofertas que coinciden.
         $idCategoria = filter_var($_GET['id_categoria'] ?? null, FILTER_VALIDATE_INT);
         $idCategoria = ($idCategoria === false || $idCategoria < 1) ? null : $idCategoria;
 
